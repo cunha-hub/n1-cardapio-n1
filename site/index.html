@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@500;600;700;800&family=Fira+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,700;1,800;1,900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/site.css">
 <link rel="stylesheet" href="css/site-v2.css">
+<link rel="stylesheet" href="css/flip.css">
 <link rel="icon" href="https://static.ifood-static.com.br/image/upload/t_thumbnail/logosgde/8adf268a-29f7-4b0f-9952-db64720acd56/202607281749_IHL5.jpeg">
 </head>
 <body>
@@ -92,21 +93,21 @@
   </div>
 </section>
 
-<!-- ============ 4. ANTES × DEPOIS (objetivo) ============ -->
-<section class="cmp" id="hoje">
-  <div class="wrap cmp-grid">
-    <div class="cmp-head">
-      <span class="eyebrow" style="color:var(--r)" data-rv>iFood N1 Vitória-ES · prints de 30/09/2026</span>
-      <h2 class="h-l" data-rv style="margin-top:14px">Antes × depois.</h2>
-      <p class="lead" data-rv style="margin-top:14px">Mesma loja e mesmas fotos, com estrutura nova. Tudo cabe no iFood: <b>categorias, itens e complementos</b>.</p>
+<!-- ============ 4. ANTES × DEPOIS: cartas que viram ============ -->
+<section class="flipsec" id="hoje">
+  <div class="wrap">
+    <div class="flip-head">
+      <div>
+        <span class="eyebrow" style="color:var(--r)" data-rv>iFood N1 Vitória-ES · prints de 30/09/2026</span>
+        <h2 class="h-l" data-rv style="margin-top:14px">Antes × depois.</h2>
+        <p class="lead" data-rv style="margin-top:12px">4 problemas reais da loja e como cada um fica. Toque numa carta para virar.</p>
+      </div>
+      <div class="seg" role="group" aria-label="Mostrar antes ou depois" data-rv>
+        <button class="on" data-v="antes" aria-pressed="true">Antes</button><button data-v="depois" aria-pressed="false">Depois</button><i></i>
+      </div>
     </div>
-    <div class="ba-slider" id="baSlider">
-      <div class="pane before" id="paneBefore"></div>
-      <div class="pane after" id="paneAfter"></div>
-      <span class="lbl l pill red">Antes</span><span class="lbl r pill ink">Depois</span>
-      <div class="handle" id="baHandle" role="slider" aria-label="Comparar antes e depois" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0"></div>
-    </div>
-    <div class="fixes" id="fixes"></div>
+    <div class="flips" id="flips"></div>
+    <div class="flip-dots" id="flipDots" aria-hidden="true"></div>
   </div>
 </section>
 

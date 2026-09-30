@@ -412,23 +412,23 @@
     layer(s, 1.12, () => { const e = eOutExpo(seg(lt, .3, 1.3)); phone(1080, 60 + (1 - e) * 900, 490, 980, (w, h) => chatScreen(w, h, lt)); });
   }
 
-  /* ---------- CENA 7 \u00B7 CMV 28% ---------- */
+  /* ---------- CENA 7 · CMV 28% ---------- */
   const CMVR = [
-    ['Coca-Cola lata', 'R$ 7,90 \u2192 R$ 13,90 (R$ 11,90 no combo)', 46.1, 26.2],
-    ['Super Combo', 'R$ 79,90 \u2192 R$ 94,90', 33.1, 27.9],
-    ['Combo P', 'R$ 54,90 \u2192 R$ 62,90', 31.7, 27.7],
-    ['Combo M', 'R$ 79,90 \u2192 R$ 87,90', 30.8, 28.0],
-    ['Chicken Burger', 'R$ 29,90 \u2192 R$ 25,90 \u00B7 mais barato', 23.5, 27.1],
-    ['Chicken Salada', 'R$ 32,90 \u2192 R$ 26,90 \u00B7 mais barato', 22.6, 27.7]
+    ['Coca-Cola lata', 'R$ 7,90 → R$ 13,90 (R$ 11,90 no combo)', 46.1, 26.2],
+    ['Super Combo', 'R$ 79,90 → R$ 94,90', 33.1, 27.9],
+    ['Combo P', 'R$ 54,90 → R$ 62,90', 31.7, 27.7],
+    ['Combo M', 'R$ 79,90 → R$ 87,90', 30.8, 28.0],
+    ['Chicken Burger', 'R$ 29,90 → R$ 25,90 · mais barato', 23.5, 27.1],
+    ['Chicken Salada', 'R$ 32,90 → R$ 26,90 · mais barato', 22.6, 27.7]
   ];
   const cmvT = i => 1.8 + i * 0.55;
   function sCmv(s, lt) {
     bg(PAPER);
     const X0 = 820, X1 = 1780, xv = v => X0 + (v - 15) / 35 * (X1 - X0), top = 430, step = 84;
     layer(s, 1, () => {
-      T('PLANILHA CMV 2026 \u00B7 NOVA OPERA\u00C7\u00C3O', 120, 150, { f: 'Dosis', w: 800, s: 22, ls: 5, c: R, al: seg(lt, .1, .5) });
-      rise('Todo pre\u00E7o com', 120, 255, seg(lt, .25, 1), { s: 90 });
-      rise('CMV de at\u00E9 28%.', 120, 355, seg(lt, .4, 1.15), { s: 90, c: R });
+      T('PLANILHA CMV 2026 · NOVA OPERAÇÃO', 120, 150, { f: 'Dosis', w: 800, s: 22, ls: 5, c: R, al: seg(lt, .1, .5) });
+      rise('Todo preço com', 120, 255, seg(lt, .25, 1), { s: 90 });
+      rise('CMV de até 28%.', 120, 355, seg(lt, .4, 1.15), { s: 90, c: R });
     });
     layer(s, 1.08, () => {
       const ap = eOutCubic(seg(lt, .8, 1.4));
@@ -453,7 +453,7 @@
       });
     });
     const q = seg(lt, 5.4, 6.1);
-    if (q > 0) layer(s, 1.2, () => { const w = pill('CMV do mix real: 28,8% \u2192 27,7%', 120, 1010, { bg: INK, c: Y, s: 24, al: eOutCubic(q) }); pill('Margem sobrando virou pre\u00E7o menor', 120 + w + 16, 1010, { bg: Y, c: INK, s: 24, al: eOutCubic(seg(lt, 5.7, 6.4)) }); });
+    if (q > 0) layer(s, 1.2, () => { const w = pill('CMV do mix real: 28,8% → 27,7%', 120, 1010, { bg: INK, c: Y, s: 24, al: eOutCubic(q) }); pill('Margem sobrando virou preço menor', 120 + w + 16, 1010, { bg: Y, c: INK, s: 24, al: eOutCubic(seg(lt, 5.7, 6.4)) }); });
   }
 
   /* ---------- CENA 8 · resultado + fecho ---------- */

@@ -162,7 +162,7 @@
     const wrap = $('#funnelViz'), cv = $('#funnelCanvas'), ctx = cv.getContext('2d'), steps = $('#funnelSteps');
     const F = diag.funil;
     steps.innerHTML = F.map((s, i) => `<div class="fstep"><div><div class="p num">${fmt(s.v, s.v % 1 ? 1 : 0)}</div>${i ? `<div class="drop">−${fmt(100 - s.v / F[i - 1].v * 100, 0)}% saem</div>` : '<div class="drop" style="color:#9fe0b5">entram</div>'}</div><div class="n">${s.k}</div></div>`).join('');
-    $('#funnelList').innerHTML = F.map((s, i) => '<li><span class="t">' + s.k + '</span><span class="v">' + fmt(s.v, s.v % 1 ? 1 : 0) + '</span><span class="b"><i style="width:' + s.v + '%"></i></span>' + (i ? '<span class="dr">\u2212' + fmt(100 - s.v / F[i - 1].v * 100, 0) + '% saem nesta etapa</span>' : '') + '</li>').join('');
+    $('#funnelList').innerHTML = F.map((s, i) => '<li><span class="t">' + s.k + '</span><span class="v">' + fmt(s.v, s.v % 1 ? 1 : 0) + '</span><span class="b"><i style="width:' + s.v + '%"></i></span>' + (i ? '<span class="dr">−' + fmt(100 - s.v / F[i - 1].v * 100, 0) + '% saem nesta etapa</span>' : '') + '</li>').join('');
     let W, H, dpr, parts = [], on = false;
     const size = () => { dpr = Math.min(devicePixelRatio, 2); W = wrap.clientWidth; H = wrap.clientHeight; cv.width = W * dpr; cv.height = H * dpr; };
     size(); addEventListener('resize', size);
@@ -199,52 +199,61 @@
     })();
   })();
 
-  /* ---------------- ANTES \u00D7 DEPOIS: corre\u00E7\u00F5es objetivas ---------------- */
-  const fixes = [
-    ['03_favoritos_duplicados.jpg', 'Super Combo com 4 pre\u00E7os diferentes', '1 an\u00FAncio e 1 pre\u00E7o nas 72 lojas'],
-    ['05_modal_combo_m_complementos.jpg', 'Combo sem bebida, doce ou troca', 'Complementos que vendem, todos com CMV \u2264 28%'],
-    ['07_sobremesas_sem_foto.jpg', 'Doce sem foto, na 12\u00AA categoria', 'Doce dentro de todo combo'],
-    ['02_super_ofertas.jpg', '13 categorias e "Tags:" na descri\u00E7\u00E3o', '7 categorias por ocasi\u00E3o, texto curto']
-  ];
-  $('#fixes').innerHTML = fixes.map(f => '<button class="fix" data-rv data-src="assets/prints/' + f[0] + '"><span class="th" style="background-image:url(\'assets/prints/' + f[0] + '\')"></span><span><s>' + f[1] + '</s><b>' + f[2] + '</b></span></button>').join('');
-  $$('#fixes [data-rv]').forEach(el => rvEls.push(el));
-  const lb = $('#lightbox');
-  $('#fixes').addEventListener('click', e => { const b = e.target.closest('.fix'); if (!b) return; $('img', lb).src = b.dataset.src; lb.classList.add('on'); });
-  lb.addEventListener('click', () => lb.classList.remove('on'));
-
-  /* ---------------- ANTES × DEPOIS ---------------- */
-  const mockItem = (n, d, pr, de, img, cls = '', extra = '') => `<div class="it ${cls}"><div><h5>${n}</h5><p>${d}</p>${extra}<div class="pr">${pr}${de ? `<s>${de}</s>` : ''}</div></div><div class="ph" style="background-image:url('${img || ''}')"></div></div>`;
-  $('#paneBefore').innerHTML = `<div class="mock"><div class="top" style="background-image:url('${IMG.capa}')"></div>
-    <div class="store"><img src="${IMG.logo}" alt=""><div><b>N1 Chicken - Frango Frito Crocante</b><br><span>★ 4.8</span></div></div>
-    <div class="tabs"><b>Destaques</b><span>Receba Cupons…</span><span>Super Ofertas N1</span><span>Os favoritos…</span><span>Frango Frito…</span></div>
-    <div class="sec">Receba Cupons Exclusivos</div>
-    ${mockItem('Cupom Exclusivo', 'Favorite o melhor Frango Frito do Brasil e receba Cupons Exclusivos! (item apenas informativo, favor não efetuar a compra)', 'R$ 0,01', '', '', 'bad')}
-    <div class="sec">Super Ofertas N1</div>
-    ${mockItem('2 Burguers + Chicken Bites Individual', '2 Burguers à sua escolha + Chicken Bites Individual. Tags: hambúrguer, burguer, burger, lanche, salada…', 'R$ 52,90', 'R$ 67,99', IMG.burgersBites, 'bad')}
-    ${mockItem('Kit 4 Maioneses 40%off', 'Leve 4 Maioneses caseiras do N1 de sua preferência com um desconto especial.', 'R$ 14,90', 'R$ 24,99', IMG.maioneses)}
-    ${mockItem('Super Combo', 'Delicie-se com essa oferta especial: escolha dois burgers de sua preferência…', 'A partir de R$ 79,90', 'R$ 102,99', IMG.superCombo, 'bad')}
-    <div class="sec">Os favoritos do N1</div>
-    ${mockItem('Trio Burguer N1', 'Escolha seu burger… tags: promoção, oferta, desconto, batata frita, aipim…', 'A partir de R$ 44,90', 'R$ 51,99', IMG.trio, 'bad')}
-    ${mockItem('Super Combo', 'Delicie-se com essa oferta especial…', 'A partir de R$ 79,90', 'R$ 102,99', IMG.superCombo, 'bad')}
-    ${mockItem('Combo M - indicamos para 2 a 3 pessoas', 'Ideal para compartilhar… Tags: combo, promoção, jantar, maionese, peito de frango…', 'A partir de R$ 79,90', 'R$ 91,49', IMG.comboM)}</div>`;
-  const aft = (id, cls) => { const i = byId(id); return mockItem(i.name, `Serve ${i.serve} ${i.serve > 1 ? 'pessoas' : 'pessoa'} · ${i.desc}`, brl(i.price), i.de ? brl(i.de) : '', i.img, cls, (i.badge ? `<span class="tag">${i.badge}</span>` : '') + (i.de ? `<span class="save">economize ${brl(i.de - i.price)}</span>` : '')); };
-  $('#paneAfter').innerHTML = `<div class="mock"><div class="top" style="background-image:url('${IMG.capa}')"></div>
-    <div class="store"><img src="${IMG.logo}" alt=""><div><b>N1 Chicken - Frango Frito Crocante</b><br><span>★ 4.8</span></div></div>
-    <div class="tabs"><b>Só pra mim</b><span>Pra dois</span><span>Pra galera</span><span>Frango & Bites</span><span>Burgers</span></div>
-    <div class="sec">Só pra mim</div>${aft('combo-p')}${aft('4-em-n1')}${aft('trio')}
-    <div class="sec">Pra dois</div>${aft('super-combo')}${aft('combo-m')}${aft('dupla')}
-    <div class="sec">Pra galera</div>${aft('combo-gg')}${aft('combo-g')}</div>`;
+  /* ---------------- ANTES × DEPOIS: cartas que viram ---------------- */
   (() => {
-    const sl = $('#baSlider'), after = $('#paneAfter'), h = $('#baHandle');
-    const set = pct => { pct = Math.max(0, Math.min(100, pct)); after.style.clipPath = `inset(0 0 0 ${pct}%)`; h.style.left = pct + '%'; h.setAttribute('aria-valuenow', Math.round(pct)); };
-    let drag = false;
-    const mv = e => { if (!drag) return; const r = sl.getBoundingClientRect(); set((e.clientX - r.left) / r.width * 100); };
-    sl.addEventListener('pointerdown', e => { drag = true; sl.setPointerCapture(e.pointerId); mv(e); });
-    sl.addEventListener('pointermove', mv);
-    sl.addEventListener('pointerup', () => drag = false);
-    h.addEventListener('keydown', e => { const v = parseFloat(h.style.left) || 50; if (e.key === 'ArrowLeft') set(v - 5); if (e.key === 'ArrowRight') set(v + 5); });
-    ScrollTrigger.create({ trigger: sl, start: 'top 70%', once: true, onEnter: () => { const o = { v: 90 }; gsap.to(o, { v: 50, duration: 1.6, ease: 'expo.inOut', onUpdate: () => set(o.v) }); } });
-    set(90);
+    const HI = 744 / 1568, HB = 0.75; // altura do print e da janela, em frações da largura
+    // frente: print real com zoom no problema [recorte %, marca %]; verso: como fica
+    const cards = [
+      { f: '03_favoritos_duplicados.jpg', crop: [50.5, 46.5, 22, 19], mk: [51.2, 47.5, 20.5, 18.2],
+        a: ['4 preços no mesmo combo', 'Super Combo por R$ 69,99, R$ 71,99, R$ 79,90 e R$ 79,99 nas lojas N1.', 'CMV de até 33%'],
+        d: ['1 anúncio, 1 preço', 'Mesmo preço nas 72 lojas, calculado para CMV de até 28%.', 'CMV 27,9%'],
+        back: '<div class="bk-card"><div class="ph" style="background-image:url(\'' + IMG.superCombo + '\')"></div><div class="b"><b>Super Combo · 2 burgers + batata + 2 Cocas</b><span class="p">R$ 94,90</span><span class="c">CMV 27,9% · igual nas 72 lojas</span></div></div>' },
+      { f: '05_modal_combo_m_complementos.jpg', crop: [51, 55, 28, 25], mk: [51.6, 61.5, 28, 11.8],
+        a: ['Combo sem venda sugerida', 'O Combo M só pede acompanhamento e molho. Não oferece bebida, doce nem troca.', 'Passo de 1 opção · +R$ 48,03'],
+        d: ['Complementos que vendem', 'Troca premium, bebida R$ 2 mais barata no combo e doce, todos com CMV de até 28%.', '+33% no pedido · CMV 27,6%'],
+        back: '<div class="bk-list"><div class="r">Troca premium · Onion Rings<span>+ R$ 8,90</span><i></i></div><div class="r">Coca lata no combo<span>+ R$ 11,90</span><i></i></div><div class="r">Brigadeiro N1<span>+ R$ 7,90</span><i></i></div><div class="tot"><span>Combo M</span><span><s>R$ 87,90</s>R$ 116,60</span></div></div>' },
+      { f: '07_sobremesas_sem_foto.jpg', crop: [15.4, 19.2, 25, 22], mk: [15.9, 19.8, 24, 21],
+        a: ['Doce sem foto, no fim', 'Churros e brigadeiro aparecem sem foto, na 12ª de 13 categorias.', '0,4% dos pedidos levam doce'],
+        d: ['Doce dentro de todo combo', 'Com foto, oferecido na hora de fechar o pedido.', '+5 p.p. de pedidos com doce'],
+        back: '<div class="bk-doce"><div class="art brigadeiro"></div><div class="chip">Fecha com doce? · Brigadeiro <b>+ R$ 7,90</b></div></div>' },
+      { f: '02_super_ofertas.jpg', crop: [15.6, 21, 23, 13], mk: [16.1, 25.6, 22.2, 5],
+        a: ['13 categorias e "Tags:"', 'Palavras-chave de busca aparecem na descrição, para o cliente ler.', '284 produtos na rede'],
+        d: ['7 categorias por ocasião', 'O cliente escolhe por quantas pessoas vão comer. A descrição fica curta.', '13 → 7 categorias · 32 itens'],
+        back: '<div class="bk-cats">' + ['Só pra mim', 'Pra dois', 'Pra galera', 'Frango & Bites', 'Burgers', 'Almoço N1', 'Complete'].map(c => '<span>' + c + '</span>').join('') + '</div>' }
+    ];
+    const fronts = [
+      '<div class="rep"><div class="rh">Super Combo · na mesma marca</div>' + [['Os favoritos do N1', 'R$ 79,90'], ['Clube Day', 'R$ 71,99'], ['Clube Week', 'R$ 79,99'], ['Loja N1 Burgers', 'R$ 69,99']].map(r => '<div class="rr"><span><b>Super Combo</b><small>' + r[0] + '</small></span><em class="bad">' + r[1] + '</em></div>').join('') + '</div>',
+      '<div class="rep"><div class="rh">Combo M · 2 a 3 pessoas</div><div class="rg">Escolha o corte · <b>1 opção</b></div><div class="rr"><span>Peito de Frango Crocante</span><em class="bad">+ R$ 48,03</em></div><div class="rg">Acompanhamento</div><div class="rr"><span>Batata Frita Super</span><em>+ R$ 26,20</em></div><div class="rr"><span>Molho Verde</span><em>+ R$ 5,67</em></div><div class="rr ghost"><span>Bebida ou doce?</span><em>não oferece</em></div></div>',
+      '<div class="rep"><div class="rh">Sobremesas · <b class="bad-t">12ª de 13 categorias</b></div>' + [['Churros N1', 'A partir de R$ 10,90'], ['Brigadeiro N1', 'R$ 7,90']].map(r => '<div class="rr ph"><span><b>' + r[0] + '</b><small>' + r[1] + '</small></span><i class="nophoto">sem foto</i></div>').join('') + '</div>',
+      '<div class="rep"><div class="tabs-strip">' + ['Destaques', 'Receba Cupons', 'Super Ofertas', 'Os favoritos', 'Frango Frito', 'Burgers', 'N1&Zé', 'Refeições', 'Acomp.', 'Sobremesas', 'Bebidas', 'Clube Day', 'Clube Week'].map(t => '<span>' + t + '</span>').join('') + '</div><div class="rg"><b class="bad-t">13 categorias</b> antes do primeiro item</div><div class="rr txt-only"><span><b>2 Burguers + Chicken Bites Individual</b><small>2 Burguers à sua escolha + Chicken Bites Individual. <mark>Tags: hambúrguer, burguer, burger, lanche, salada, jantar, frango frito…</mark></small></span></div></div>'
+    ];
+    const crop = c => {
+      const [x, y, w, h] = c.crop.map(v => v / 100), [mx, my, mw, mh] = c.mk.map(v => v / 100);
+      const sc = Math.max(HB / HI, Math.min(1 / (w * 1.08), HB * 0.92 / (h * HI)));
+      let tx = 0.5 - (x + w / 2) * sc, ty = HB / (2 * HI) - (y + h / 2) * sc;          // frações da largura / da altura do print
+      tx = Math.min(0, Math.max(1 - sc, tx)); ty = Math.min(0, Math.max(HB / HI - sc, ty)); // sem bordas vazias
+      const L = (tx + sc * mx) * 100, T = (ty + sc * my) * HI / HB * 100, Wd = sc * mw * 100, Ht = sc * mh * HI / HB * 100;
+      return '<div class="vis crop"><img loading="lazy" alt="Print do iFood" src="assets/prints/' + c.f + '" style="transform:translate(' + (tx * 100).toFixed(2) + '%,' + (ty * 100).toFixed(2) + '%) scale(' + sc.toFixed(3) + ')"><span class="mk" style="left:' + L.toFixed(2) + '%;top:' + T.toFixed(2) + '%;width:' + Wd.toFixed(2) + '%;height:' + Ht.toFixed(2) + '%"></span></div>';
+    };
+    const txt = (t, kind) => '<div class="txt"><span class="tag pill ' + (kind === 'a' ? 'red' : '') + '">' + (kind === 'a' ? 'Antes' : 'Depois') + '</span><h4>' + t[0] + '</h4><p>' + t[1] + '</p><div class="m">' + t[2] + '</div></div>';
+    const box = $('#flips');
+    box.innerHTML = cards.map((c, i) => '<article class="flip" tabindex="0" role="button" aria-pressed="false" aria-label="Carta ' + (i + 1) + ': ' + c.a[0] + '. Toque para ver como fica."><div class="inner">' +
+      '<div class="face front"><span class="n">' + (i + 1) + '</span><span class="hint">Toque ↻</span><div class="vis">' + fronts[i] + '<button class="proof" data-src="assets/prints/' + c.f + '">Ver print ↗</button></div>' + txt(c.a, 'a') + '</div>' +
+      '<div class="face back"><span class="n">' + (i + 1) + '</span><div class="vis">' + c.back + '</div>' + txt(c.d, 'd') + '</div></div></article>').join('');
+    const flips = $$('.flip', box), seg = $('.seg'), segBtns = $$('button', seg);
+    const syncSeg = () => { const all = flips.every(f => f.classList.contains('on')); seg.classList.toggle('depois', all); segBtns.forEach(b => { const on = (b.dataset.v === 'depois') === all; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }); };
+    const setCard = (f, on) => { f.classList.toggle('on', on); f.setAttribute('aria-pressed', on); };
+    const lb = $('#lightbox');
+    box.addEventListener('click', e => { const p = e.target.closest('.proof'); if (!p) return; e.stopPropagation(); $('img', lb).src = p.dataset.src; lb.classList.add('on'); }, true);
+    lb.addEventListener('click', () => lb.classList.remove('on'));
+    flips.forEach(f => {
+      f.addEventListener('click', e => { if (e.target.closest('.proof')) return; setCard(f, !f.classList.contains('on')); syncSeg(); });
+      f.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); f.click(); } });
+    });
+    segBtns.forEach(b => b.addEventListener('click', () => { const on = b.dataset.v === 'depois'; flips.forEach((f, i) => setTimeout(() => setCard(f, on), i * 110)); setTimeout(syncSeg, flips.length * 110); }));
+    // pontos do carrossel (celular)
+    const dots = $('#flipDots'); dots.innerHTML = flips.map((_, i) => '<i class="' + (i ? '' : 'on') + '"></i>').join('');
+    box.addEventListener('scroll', () => { const i = Math.round(box.scrollLeft / (flips[0].offsetWidth + 14)); $$('i', dots).forEach((d, k) => d.classList.toggle('on', k === i)); }, { passive: true });
   })();
 
   /* ---------------- CARDÁPIO ---------------- */
@@ -422,15 +431,15 @@
   (() => {
     const rows = ['coca', '4-em-n1', 'super-combo', 'combo-p', 'combo-g', 'combo-m', 'bites-m', 'dupla', 'classic', 'salada', 'parmegiana'].map(byId);
     const X0 = 15, X1 = 50, c01 = v => Math.max(0, Math.min(1, v)), px = v => (c01((v - X0) / (X1 - X0)) * 100).toFixed(2) + '%';
-    const short = n => n.split(' \u00B7 ')[0];
+    const short = n => n.split(' · ')[0];
     $('#dumbRows').innerHTML = rows.map(r => {
       const a = Math.min(r.cmvHoje, r.cmv), b = Math.max(r.cmvHoje, r.cmv);
-      const dir = r.price < r.hoje ? 'pre\u00E7o \u2193' : r.price > r.hoje ? 'pre\u00E7o \u2191' : 'igual';
-      const tipTxt = '<b>' + short(r.name) + '</b><br>Hoje: ' + brl(r.hoje) + ' \u00B7 CMV ' + fmt(r.cmvHoje, 1) + '%<br>Novo: ' + brl(r.price) + ' \u00B7 CMV ' + fmt(r.cmv, 1) + '%';
+      const dir = r.price < r.hoje ? 'preço ↓' : r.price > r.hoje ? 'preço ↑' : 'igual';
+      const tipTxt = '<b>' + short(r.name) + '</b><br>Hoje: ' + brl(r.hoje) + ' · CMV ' + fmt(r.cmvHoje, 1) + '%<br>Novo: ' + brl(r.price) + ' · CMV ' + fmt(r.cmv, 1) + '%';
       return '<div class="drow" tabindex="0" data-tip="' + tipTxt.replace(/"/g, '&quot;') + '">' +
-        '<div class="nm">' + short(r.name) + '<small>' + brl(r.hoje) + ' \u2192 ' + brl(r.price) + ' \u00B7 ' + dir + '</small></div>' +
+        '<div class="nm">' + short(r.name) + '<small>' + brl(r.hoje) + ' → ' + brl(r.price) + ' · ' + dir + '</small></div>' +
         '<div class="track"><span class="ref" style="left:' + px(28) + '"></span><span class="bar" style="left:' + px(a) + ';width:calc(' + px(b) + ' - ' + px(a) + ')"></span><span class="d o" style="left:' + px(r.cmvHoje) + '"></span><span class="d f" style="left:' + px(r.cmv) + '"></span></div>' +
-        '<div class="val">' + fmt(r.cmvHoje, 1) + '% \u2192 <b>' + fmt(r.cmv, 1) + '%</b></div></div>';
+        '<div class="val">' + fmt(r.cmvHoje, 1) + '% → <b>' + fmt(r.cmv, 1) + '%</b></div></div>';
     }).join('');
     $('#dumbAxis').innerHTML = [15, 20, 25, 28, 35, 40, 45, 50].map(v => '<span style="left:' + px(v) + ';' + (v === 28 ? 'color:var(--r);font-weight:800' : '') + '">' + v + '%</span>').join('');
     const tip = $('#dumbTip'), fig = $('.dumb');
@@ -438,7 +447,7 @@
     $$('.drow').forEach(r => { r.addEventListener('pointermove', e => show(r, e.clientX, e.clientY)); r.addEventListener('pointerleave', () => tip.classList.remove('on')); r.addEventListener('focus', () => { const bb = r.getBoundingClientRect(); show(r, bb.left + bb.width / 2, bb.bottom - 10); }); r.addEventListener('blur', () => tip.classList.remove('on')); });
     const all = categories.flatMap(c => c.items);
     $('#cmvTable').innerHTML = '<thead><tr><th>Item</th><th>Hoje</th><th>CMV hoje</th><th>Novo</th><th>CMV novo</th></tr></thead><tbody>' +
-      all.map(i => '<tr><td>' + short(i.name) + '</td><td>' + (i.hoje ? brl(i.hoje) : '\u2014') + '</td><td class="' + (i.cmvHoje > 28 ? 'hi' : '') + '">' + (i.cmvHoje ? fmt(i.cmvHoje, 1) + '%' : '\u2014') + '</td><td>' + brl(i.price) + '</td><td class="ok">' + fmt(i.cmv, 1) + '%</td></tr>').join('') + '</tbody>';
+      all.map(i => '<tr><td>' + short(i.name) + '</td><td>' + (i.hoje ? brl(i.hoje) : '—') + '</td><td class="' + (i.cmvHoje > 28 ? 'hi' : '') + '">' + (i.cmvHoje ? fmt(i.cmvHoje, 1) + '%' : '—') + '</td><td>' + brl(i.price) + '</td><td class="ok">' + fmt(i.cmv, 1) + '%</td></tr>').join('') + '</tbody>';
   })();
 
   /* ---------------- ponte do ticket ---------------- */

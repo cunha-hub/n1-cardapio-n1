@@ -148,3 +148,6 @@
   .bag-btn { left: 12px; bottom: 16px; padding: 10px 14px 10px 10px; font-size: 14px; }
   .site-foot { padding: 70px 0 110px; }
 }
+
+/* negrito dentro do texto das notas do funil não herda o estilo do número */
+.fnote p b { display: inline; font-size: inherit; color: #fff; font-family: inherit; }
