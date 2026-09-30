@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>N1 Chicken · Vídeo de apresentação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dosis:wght@600;700;800&family=Fira+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,800;1,900&display=swap" rel="stylesheet">
+<style>
+  :root { --y: #FFED00; --r: #FF0000; --ink: #1A0C05; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #0b0503; color: #fff; font-family: 'Fira Sans', system-ui, sans-serif; overflow: hidden; }
+  .stage { position: fixed; inset: 0; display: grid; place-items: center; }
+  canvas { width: min(100vw, 177.78vh); height: min(56.25vw, 100vh); display: block; background: #000; }
+  .ui { position: fixed; left: 0; right: 0; bottom: 0; padding: 14px 16px 16px; display: flex; gap: 10px; align-items: center; background: linear-gradient(transparent, rgba(0,0,0,.7)); opacity: 0; transition: opacity .3s; }
+  body:hover .ui, body.paused .ui { opacity: 1; }
+  .ui button { font: 700 14px 'Dosis', sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); background: var(--y); border: 0; border-radius: 99px; padding: 9px 14px; cursor: pointer; white-space: nowrap; }
+  .ui button.alt { background: rgba(255,255,255,.14); color: #fff; }
+  .ui input[type=range] { flex: 1; accent-color: var(--r); min-width: 60px; }
+  .ui .tc { font: 700 13px 'Dosis', sans-serif; letter-spacing: .06em; min-width: 92px; text-align: right; font-variant-numeric: tabular-nums; }
+  .start { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(11,5,3,.35); cursor: pointer; }
+  .start .b { width: 112px; height: 112px; border-radius: 50%; background: var(--y); display: grid; place-items: center; box-shadow: 0 20px 60px rgba(0,0,0,.5); transition: transform .3s; }
+  .start:hover .b { transform: scale(1.08); }
+  .start .b::after { content: ''; border-left: 36px solid var(--ink); border-top: 22px solid transparent; border-bottom: 22px solid transparent; margin-left: 10px; }
+  .start small { position: absolute; bottom: 12%; font: 700 13px 'Dosis', sans-serif; letter-spacing: .3em; text-transform: uppercase; opacity: .9; text-shadow: 0 2px 10px #000; }
+  .rec { position: fixed; top: 14px; left: 14px; font: 800 13px 'Dosis', sans-serif; letter-spacing: .08em; background: var(--r); padding: 8px 12px; border-radius: 8px; display: none; }
+  .rec.on { display: block; animation: blink 1s infinite; }
+  @keyframes blink { 50% { opacity: .5; } }
+  @media (max-width: 560px) { .ui { flex-wrap: wrap; } .ui input[type=range] { order: -1; flex-basis: 100%; } }
+  /* dentro do site: controles mínimos, nada cobre o vídeo antes do play */
+  body.embed:not(.started) .ui { display: none; }
+  body.embed #export, body.embed #restart { display: none; }
+  body.embed .ui { flex-wrap: nowrap; padding: 6px 8px 8px; gap: 6px; }
+  body.embed .ui input[type=range] { order: 0; flex-basis: auto; }
+  body.embed .ui button { padding: 6px 10px; font-size: 12px; }
+  @media (max-width: 560px) { body.embed .tc { display: none; } .start .b { width: 72px; height: 72px; } .start .b::after { border-left-width: 24px; border-top-width: 15px; border-bottom-width: 15px; margin-left: 6px; } .start small { font-size: 10px; letter-spacing: .2em; bottom: 8%; } }
+</style>
+</head>
+<body class="paused">
+<div class="stage"><canvas id="c" width="1920" height="1080" aria-label="Vídeo de apresentação N1 Chicken"></canvas></div>
+<div class="start" id="start"><div class="b"></div><small>Assistir com som · 1m28s</small></div>
+<div class="rec" id="recTag">● GRAVANDO .WEBM · NÃO TROQUE DE ABA</div>
+<div class="ui">
+  <button id="play">▶ Play</button>
+  <button class="alt" id="restart">↺</button>
+  <input type="range" id="seek" min="0" max="88.5" step="0.01" value="0" aria-label="Linha do tempo">
+  <span class="tc" id="tc">00:00 / 01:28</span>
+  <button class="alt" id="fs">⛶</button>
+  <button id="export" title="Grava o vídeo com áudio em tempo real e baixa um .webm">Exportar .webm</button>
+</div>
+<script src="js/menu-data.js"></script>
+<script src="js/video.js"></script>
+</body>
+</html>

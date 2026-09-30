@@ -1,0 +1,519 @@
+{
+ "itens": [
+  {
+   "id": "combo-p",
+   "nome": "Combo P · Caixa P + acomp. Super + molho",
+   "custo": 17.4,
+   "preco": 62.9,
+   "cmv": 27.7,
+   "hoje": 54.9,
+   "cmvHoje": 31.7,
+   "planilha": 55.9,
+   "comp": [
+    "caixa-p",
+    "batata-super",
+    "molho"
+   ],
+   "de": 65.7,
+   "economia": 2.8
+  },
+  {
+   "id": "combo-m",
+   "nome": "Combo M · Caixa M + acomp. Super + molho",
+   "custo": 24.57,
+   "preco": 87.9,
+   "cmv": 28,
+   "hoje": 79.9,
+   "cmvHoje": 30.8,
+   "planilha": 79.9,
+   "comp": [
+    "caixa-m",
+    "batata-super",
+    "molho"
+   ],
+   "de": 90.7,
+   "economia": 2.8
+  },
+  {
+   "id": "combo-g",
+   "nome": "Combo G · Caixa G + 2 acomp. + 2 molhos",
+   "custo": 41.61,
+   "preco": 148.9,
+   "cmv": 27.9,
+   "hoje": 132.9,
+   "cmvHoje": 31.3,
+   "planilha": 139.9,
+   "comp": [
+    "caixa-g",
+    "batata-super",
+    "batata-super",
+    "molho",
+    "molho"
+   ],
+   "de": 159.5,
+   "economia": 10.6
+  },
+  {
+   "id": "combo-gg",
+   "nome": "Combo GG · Caixa G + Caixa M + 2 acomp. + 3 molhos",
+   "custo": 59.51,
+   "preco": 212.9,
+   "cmv": 28,
+   "hoje": 189.9,
+   "cmvHoje": 31.3,
+   "planilha": 219.9,
+   "comp": [
+    "caixa-g",
+    "caixa-m",
+    "batata-super",
+    "batata-super",
+    "molho",
+    "molho",
+    "molho"
+   ],
+   "de": 224.3,
+   "economia": 11.4
+  },
+  {
+   "id": "caixa-p",
+   "nome": "Caixa P · Cortes clássicos",
+   "custo": 8.95,
+   "preco": 32.9,
+   "cmv": 27.2,
+   "hoje": 29.9,
+   "cmvHoje": 29.9,
+   "planilha": 31.9
+  },
+  {
+   "id": "caixa-m",
+   "nome": "Caixa M · Cortes clássicos",
+   "custo": 16.16,
+   "preco": 57.9,
+   "cmv": 27.9,
+   "hoje": 54.9,
+   "cmvHoje": 29.4,
+   "planilha": 56.9
+  },
+  {
+   "id": "caixa-g",
+   "nome": "Caixa G · Cortes clássicos",
+   "custo": 26.2,
+   "preco": 93.9,
+   "cmv": 27.9,
+   "hoje": 84.9,
+   "cmvHoje": 30.9,
+   "planilha": 92.9
+  },
+  {
+   "id": "bites-ind",
+   "nome": "Chicken Bites Individual",
+   "custo": 3.07,
+   "preco": 11.9,
+   "cmv": 25.8,
+   "hoje": 9.99,
+   "cmvHoje": 30.7,
+   "planilha": 9.9
+  },
+  {
+   "id": "bites-p",
+   "nome": "Chicken Bites P",
+   "custo": 8.43,
+   "preco": 30.9,
+   "cmv": 27.3,
+   "hoje": 26.9,
+   "cmvHoje": 31.3,
+   "planilha": 28.9
+  },
+  {
+   "id": "bites-m",
+   "nome": "Chicken Bites M",
+   "custo": 15.13,
+   "preco": 54.9,
+   "cmv": 27.6,
+   "hoje": 49.9,
+   "cmvHoje": 30.3,
+   "planilha": 52.9
+  },
+  {
+   "id": "classic",
+   "nome": "Chicken Burger",
+   "custo": 7.02,
+   "preco": 25.9,
+   "cmv": 27.1,
+   "hoje": 29.9,
+   "cmvHoje": 23.5,
+   "planilha": 31.9
+  },
+  {
+   "id": "bbq",
+   "nome": "Chicken Barbecue",
+   "custo": 6.75,
+   "preco": 24.9,
+   "cmv": 27.1,
+   "hoje": 29.9,
+   "cmvHoje": 22.6,
+   "planilha": 29.9
+  },
+  {
+   "id": "salada",
+   "nome": "Chicken Salada",
+   "custo": 7.45,
+   "preco": 26.9,
+   "cmv": 27.7,
+   "hoje": 32.9,
+   "cmvHoje": 22.6,
+   "planilha": 33.9
+  },
+  {
+   "id": "onion",
+   "nome": "Chicken Onion Burger",
+   "custo": 8.26,
+   "preco": 29.9,
+   "cmv": 27.6,
+   "hoje": 32.9,
+   "cmvHoje": 25.1,
+   "planilha": 38.9
+  },
+  {
+   "id": "garlic",
+   "nome": "Chicken Garlic Bacon",
+   "custo": 8.36,
+   "preco": 29.9,
+   "cmv": 28,
+   "hoje": 32.9,
+   "cmvHoje": 25.4,
+   "planilha": 38.9
+  },
+  {
+   "id": "bbc",
+   "nome": "BBC · Barbecue, Bacon & Cheddar",
+   "custo": 8.49,
+   "preco": 30.9,
+   "cmv": 27.5,
+   "hoje": 36.9,
+   "cmvHoje": 23,
+   "planilha": 39.9
+  },
+  {
+   "id": "dupla",
+   "nome": "Dupla N1 · 2 burgers clássicos",
+   "custo": 13.26,
+   "preco": 47.9,
+   "cmv": 27.7,
+   "hoje": 44.9,
+   "cmvHoje": 29.5,
+   "planilha": 49.9,
+   "comp": [
+    "classic",
+    "classic"
+   ],
+   "de": 51.8,
+   "economia": 3.9
+  },
+  {
+   "id": "dupla-bites",
+   "nome": "Dupla N1 + Chicken Bites",
+   "custo": 16.33,
+   "preco": 58.9,
+   "cmv": 27.7,
+   "hoje": 52.9,
+   "cmvHoje": 30.9,
+   "planilha": null,
+   "comp": [
+    "classic",
+    "classic",
+    "bites-ind"
+   ],
+   "de": 63.7,
+   "economia": 4.8
+  },
+  {
+   "id": "trio",
+   "nome": "Trio Burger N1 · burger + batata + Coca",
+   "custo": 12.36,
+   "preco": 44.9,
+   "cmv": 27.5,
+   "hoje": 44.9,
+   "cmvHoje": 27.5,
+   "planilha": 44.9,
+   "comp": [
+    "classic",
+    "batata-ind",
+    "coca"
+   ],
+   "de": 47.7,
+   "economia": 2.8
+  },
+  {
+   "id": "4-em-n1",
+   "nome": "4 em N1 · burger + batata + Coca + brigadeiro",
+   "custo": 14.38,
+   "preco": 51.9,
+   "cmv": 27.7,
+   "hoje": 39.99,
+   "cmvHoje": 36,
+   "planilha": null,
+   "comp": [
+    "classic",
+    "batata-ind",
+    "coca",
+    "brigadeiro"
+   ],
+   "de": 55.6,
+   "economia": 3.7
+  },
+  {
+   "id": "combinho",
+   "nome": "Combinho Chicken Bites + batata + Coca",
+   "custo": 9.19,
+   "preco": 32.9,
+   "cmv": 27.9,
+   "hoje": 29.9,
+   "cmvHoje": 30.7,
+   "planilha": null,
+   "comp": [
+    "bites-ind",
+    "batata-ind",
+    "coca"
+   ],
+   "de": 33.7,
+   "economia": 0.8
+  },
+  {
+   "id": "super-combo",
+   "nome": "Super Combo · 2 burgers + batata Super + 2 Cocas",
+   "custo": 26.43,
+   "preco": 94.9,
+   "cmv": 27.9,
+   "hoje": 79.9,
+   "cmvHoje": 33.1,
+   "planilha": 89.9,
+   "comp": [
+    "classic",
+    "classic",
+    "batata-super",
+    "coca",
+    "coca"
+   ],
+   "de": 105.5,
+   "economia": 10.6
+  },
+  {
+   "id": "3-burgers",
+   "nome": "Trinca N1 · 3 burgers clássicos",
+   "custo": 19.72,
+   "preco": 70.9,
+   "cmv": 27.8,
+   "hoje": 64.9,
+   "cmvHoje": 30.4,
+   "planilha": null,
+   "comp": [
+    "classic",
+    "classic",
+    "classic"
+   ],
+   "de": 77.7,
+   "economia": 6.8
+  },
+  {
+   "id": "tradicional",
+   "nome": "Tradicional N1",
+   "custo": 8.7,
+   "preco": 31.9,
+   "cmv": 27.3,
+   "hoje": 34.9,
+   "cmvHoje": 24.9,
+   "planilha": 38.9
+  },
+  {
+   "id": "parmegiana",
+   "nome": "Frango à Parmegiana N1",
+   "custo": 8.4,
+   "preco": 30.9,
+   "cmv": 27.2,
+   "hoje": 39.9,
+   "cmvHoje": 21.1,
+   "planilha": 38.9
+  },
+  {
+   "id": "frito-salada",
+   "nome": "Frango Frito com Salada N1",
+   "custo": 8.41,
+   "preco": 30.9,
+   "cmv": 27.2,
+   "hoje": 34.9,
+   "cmvHoje": 24.1,
+   "planilha": 38.9
+  },
+  {
+   "id": "estrogonofe",
+   "nome": "Estrogonofe de Frango N1",
+   "custo": 8.33,
+   "preco": 29.9,
+   "cmv": 27.9,
+   "hoje": 32.9,
+   "cmvHoje": 25.3,
+   "planilha": 33.9
+  },
+  {
+   "id": "batata-ind",
+   "nome": "Batata Frita Individual",
+   "custo": 2.02,
+   "preco": 7.9,
+   "cmv": 25.6,
+   "hoje": 11.9,
+   "cmvHoje": 17,
+   "planilha": 11.9
+  },
+  {
+   "id": "batata-super",
+   "nome": "Batata Frita Super",
+   "custo": 7.09,
+   "preco": 25.9,
+   "cmv": 27.4,
+   "hoje": null,
+   "cmvHoje": null,
+   "planilha": 34.9
+  },
+  {
+   "id": "aipim-ind",
+   "nome": "Aipim Frito Individual",
+   "custo": 1.71,
+   "preco": 6.9,
+   "cmv": 24.8,
+   "hoje": 12.9,
+   "cmvHoje": 13.3,
+   "planilha": 12.9
+  },
+  {
+   "id": "rings-ind",
+   "nome": "Onion Rings Individual",
+   "custo": 2.62,
+   "preco": 9.9,
+   "cmv": 26.5,
+   "hoje": 12.9,
+   "cmvHoje": 20.3,
+   "planilha": 12.9
+  },
+  {
+   "id": "molho",
+   "nome": "Maionese da casa (potinho)",
+   "custo": 1.87,
+   "preco": 6.9,
+   "cmv": 27.1,
+   "hoje": 6.49,
+   "cmvHoje": 28.8,
+   "planilha": 8.9
+  },
+  {
+   "id": "brigadeiro",
+   "nome": "Brigadeiro N1 de colher",
+   "custo": 2.02,
+   "preco": 7.9,
+   "cmv": 25.6,
+   "hoje": 7.9,
+   "cmvHoje": 25.6,
+   "planilha": 9.9
+  },
+  {
+   "id": "churros",
+   "nome": "Churros N1",
+   "custo": 2.63,
+   "preco": 9.9,
+   "cmv": 26.6,
+   "hoje": 10.9,
+   "cmvHoje": 24.1,
+   "planilha": 11.9
+  },
+  {
+   "id": "coca",
+   "nome": "Coca-Cola lata",
+   "custo": 3.64,
+   "preco": 13.9,
+   "cmv": 26.2,
+   "hoje": 7.9,
+   "cmvHoje": 46.1,
+   "planilha": 11.9
+  }
+ ],
+ "complementos": [
+  {
+   "nome": "Onion Rings no lugar da batata (Δ custo)",
+   "custo": 2.250000000000001,
+   "preco": 8.9,
+   "cmv": 25.3
+  },
+  {
+   "nome": "Cheddar & Bacon no lugar da batata (Δ custo)",
+   "custo": 2.8400000000000007,
+   "preco": 10.9,
+   "cmv": 26.1
+  },
+  {
+   "nome": "Purê Mega no lugar do Super (Δ custo)",
+   "custo": 1.3599999999999999,
+   "preco": 4.9,
+   "cmv": 27.8
+  },
+  {
+   "nome": "+ Batata individual extra",
+   "custo": 2.02,
+   "preco": 7.9,
+   "cmv": 25.6
+  },
+  {
+   "nome": "+ Chicken Bites individual",
+   "custo": 3.07,
+   "preco": 11.9,
+   "cmv": 25.8
+  },
+  {
+   "nome": "Molho extra",
+   "custo": 1.87,
+   "preco": 6.9,
+   "cmv": 27.1
+  },
+  {
+   "nome": "Molho Cheddar extra",
+   "custo": 2.33,
+   "preco": 8.9,
+   "cmv": 26.2
+  },
+  {
+   "nome": "Coca-Cola lata no combo",
+   "custo": 3.32,
+   "preco": 11.9,
+   "cmv": 27.9
+  },
+  {
+   "nome": "Brigadeiro no combo",
+   "custo": 2.02,
+   "preco": 7.9,
+   "cmv": 25.6
+  },
+  {
+   "nome": "Churros no combo",
+   "custo": 2.63,
+   "preco": 9.9,
+   "cmv": 26.6
+  },
+  {
+   "nome": "Burger Salada no lugar do clássico (Δ)",
+   "custo": 0.4299999999999997,
+   "preco": 1.9,
+   "cmv": 22.6
+  },
+  {
+   "nome": "Burger Onion/Garlic no lugar do clássico (Δ)",
+   "custo": 1.3399999999999999,
+   "preco": 4.9,
+   "cmv": 27.3
+  },
+  {
+   "nome": "Burger BBC no lugar do clássico (Δ)",
+   "custo": 1.4699999999999998,
+   "preco": 5.9,
+   "cmv": 24.9
+  }
+ ]
+}

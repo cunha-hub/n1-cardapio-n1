@@ -1,0 +1,7 @@
+# cópia dos prints (os usados pelo site ficam em site/assets/prints)
+prints_ifood/
+site/_snaps/
+*.webm
+desktop.ini
+.DS_Store
+site/assets/prints/09_bi_funil_conversao.jpg

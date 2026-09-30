@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FF0000">
+<title>N1 Chicken · O Cardápio Nº1</title>
+<meta name="description" content="Nova estrutura de cardápio da N1 Chicken para iFood e app próprio, com todo preço em CMV de até 28%, baseada nos dados do BI Tastefy.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dosis:wght@500;600;700;800&family=Fira+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/site-v2.css">
+<link rel="icon" href="https://static.ifood-static.com.br/image/upload/t_thumbnail/logosgde/8adf268a-29f7-4b0f-9952-db64720acd56/202607281749_IHL5.jpeg">
+</head>
+<body>
+
+<div id="loader"><img class="seal" alt="" src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/8adf268a-29f7-4b0f-9952-db64720acd56/202607281749_IHL5.jpeg"><div class="bar"><i></i></div></div>
+
+<nav class="nav" aria-label="Seções">
+  <img alt="N1 Chicken" src="https://static.ifood-static.com.br/image/upload/t_thumbnail/logosgde/8adf268a-29f7-4b0f-9952-db64720acd56/202607281749_IHL5.jpeg">
+  <div class="links">
+    <a href="#hoje">Antes × depois</a>
+    <a href="#cmv">CMV 28%</a>
+    <a href="#cardapio">Cardápio</a>
+    <a href="#app">App + IA</a>
+    <a href="#impacto">Impacto</a>
+  </div>
+  <a class="m-link" href="#cardapio">Cardápio</a>
+  <a class="cta" href="#filme">▶ Vídeo</a>
+</nav>
+
+<!-- ============ 1. ABERTURA (vídeo controlado pelo scroll) ============ -->
+<section class="hero" id="topo">
+  <div class="hero-stage">
+    <div class="hero-media" id="heroMedia">
+      <video id="heroVideo" muted playsinline preload="auto" src="assets/abertura.mp4"></video>
+      <canvas id="heroCanvas" hidden></canvas>
+      <div class="veil"></div>
+    </div>
+    <div class="hero-copy" id="heroCopy">
+      <div>
+        <div class="t1" id="heroTitle">N•1</div>
+        <div class="t2" id="heroSub">O maior frango da rede · o cardápio que ele merece</div>
+      </div>
+    </div>
+    <div class="hero-panel l" id="panelL"><img class="wm" alt="" src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/8adf268a-29f7-4b0f-9952-db64720acd56/202607281749_IHL5.jpeg"></div>
+    <div class="hero-panel r" id="panelR"><img class="wm" alt="" src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/8adf268a-29f7-4b0f-9952-db64720acd56/202607281749_IHL5.jpeg"></div>
+    <div class="hero-seal" id="heroSeal"><img alt="Number One Chicken" src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/8adf268a-29f7-4b0f-9952-db64720acd56/202607281749_IHL5.jpeg"></div>
+    <div class="hero-final">
+      <div class="fl" id="finL"><div class="big">O maior<br>da rede.</div><small>60.850 pedidos em setembro</small></div>
+      <div class="fr" id="finR"><div class="big">Agora com o<br>cardápio Nº1.</div><small>CMV de até 28% · iFood + app</small></div>
+    </div>
+    <div class="scroll-cue" id="cue">role<i></i></div>
+    <div class="hero-note" id="heroNote" hidden>Espaço do vídeo de abertura → <b>site/assets/abertura.mp4</b></div>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true"><div class="track">
+  <span>Menos cliques, mais crocância</span><span>Todo preço com CMV de até 28%</span><span>O iFood apresenta. O app fideliza</span><span>13 categorias viram 7</span><span>Combo bom é o que você nem precisa montar</span>
+  <span>Menos cliques, mais crocância</span><span>Todo preço com CMV de até 28%</span><span>O iFood apresenta. O app fideliza</span><span>13 categorias viram 7</span><span>Combo bom é o que você nem precisa montar</span>
+</div></div>
+
+<!-- ============ 2. NÚMEROS ============ -->
+<section class="stats">
+  <div class="wrap">
+    <span class="eyebrow" data-rv>BI Tastefy · setembro/2026 · todas as lojas N1</span>
+    <h2 class="h-l" data-rv style="margin-top:18px">A N1 já é a número um.<br><span style="color:var(--r)">O cardápio ainda não.</span></h2>
+    <div class="stats-grid">
+      <div class="stat" data-rv><div class="v num" data-count="517910">517.910</div><div class="k"><b>visitas/mês</b> na loja do iFood. É a marca com mais tráfego da rede.</div></div>
+      <div class="stat" data-rv><div class="v num" data-count="60850">60.850</div><div class="k"><b>pedidos/mês</b>, 34% dos pedidos da rede NFB.</div></div>
+      <div class="stat" data-rv><div class="v num" data-count="11.75" data-dec="2" data-suf="%">11,75%</div><div class="k"><b>de conversão</b>, contra 14,93% da Marmita Top.</div></div>
+      <div class="stat" data-rv><div class="v num" data-count="28.8" data-dec="1" data-suf="%">28,8%</div><div class="k"><b>de CMV no mix</b>: 17 dos 32 itens passam de 28%.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. FUNIL ============ -->
+<section class="funnel grain">
+  <div class="wrap">
+    <span class="eyebrow" style="color:var(--y)" data-rv>Funil de conversão · onde o cliente sai</span>
+    <h2 class="h-l" data-rv style="margin-top:18px">De cada 100 que entram,<br><em>só 11 pedem.</em></h2>
+    <div class="funnel-viz" id="funnelViz">
+      <canvas id="funnelCanvas"></canvas>
+      <div class="funnel-steps" id="funnelSteps"></div>
+    </div>
+    <ol class="funnel-list" id="funnelList" aria-label="Funil de conversão"></ol>
+    <div class="funnel-notes">
+      <div class="fnote" data-rv><b>49%</b><p>entram e <b>não clicam em nada</b>: 13 categorias e itens repetidos, sem um caminho óbvio.</p></div>
+      <div class="fnote" data-rv><b>60%</b><p>abrem um item e <b>não põem na sacola</b>. É a maior perda do funil, e é onde o cardápio precisa vender.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. ANTES × DEPOIS (objetivo) ============ -->
+<section class="cmp" id="hoje">
+  <div class="wrap cmp-grid">
+    <div class="cmp-head">
+      <span class="eyebrow" style="color:var(--r)" data-rv>iFood N1 Vitória-ES · prints de 30/09/2026</span>
+      <h2 class="h-l" data-rv style="margin-top:14px">Antes × depois.</h2>
+      <p class="lead" data-rv style="margin-top:14px">Mesma loja e mesmas fotos, com estrutura nova. Tudo cabe no iFood: <b>categorias, itens e complementos</b>.</p>
+    </div>
+    <div class="ba-slider" id="baSlider">
+      <div class="pane before" id="paneBefore"></div>
+      <div class="pane after" id="paneAfter"></div>
+      <span class="lbl l pill red">Antes</span><span class="lbl r pill ink">Depois</span>
+      <div class="handle" id="baHandle" role="slider" aria-label="Comparar antes e depois" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0"></div>
+    </div>
+    <div class="fixes" id="fixes"></div>
+  </div>
+</section>
+
+<!-- ============ 5. CMV 28% ============ -->
+<section class="cmv" id="cmv">
+  <div class="wrap">
+    <span class="eyebrow" style="color:var(--r)" data-rv>Planilha CMV 2026 · Nova Operação</span>
+    <h2 class="h-l" data-rv style="margin-top:14px">Todo preço com<br>CMV de até 28%.</h2>
+    <p class="lead" data-rv style="margin-top:16px">Regra única: <b>preço = menor valor terminado em ,90 com (custo + embalagem) ÷ preço ≤ 28%</b>. O item que tinha margem sobrando ficou mais barato e virou isca. O que estourava subiu ou mudou de composição.</p>
+    <div class="cmv-kpis">
+      <div data-rv><b class="num">17 de 32</b><span>itens acima de 28% hoje</span></div>
+      <div data-rv><b class="num">28,8% → 27,7%</b><span>CMV do mix real de vendas</span></div>
+      <div data-rv><b class="num">46%</b><span>CMV da Coca lata vendida a R$ 7,90</span></div>
+    </div>
+    <figure class="dumb" data-rv>
+      <figcaption><span class="lg"><i class="o"></i>Hoje (iFood Vitória)</span><span class="lg"><i class="f"></i>Novo</span><span class="lg"><i class="ln"></i>Teto 28%</span></figcaption>
+      <div class="dumb-rows" id="dumbRows"></div>
+      <div class="dumb-axis" id="dumbAxis"></div>
+      <div class="dumb-tip" id="dumbTip" role="status"></div>
+    </figure>
+    <details class="cmv-table" data-rv><summary>Ver tabela completa (32 itens)</summary><div class="tbl-wrap"><table id="cmvTable"></table></div></details>
+  </div>
+</section>
+
+<!-- ============ 6. DUAS VISÕES ============ -->
+<section class="two" id="visoes">
+  <div class="ifood">
+    <span class="eyebrow" style="color:#ea1d2c" data-rv>Visão iFood</span>
+    <h2 class="h-l" data-rv style="margin-top:14px">Com as armas<br>da plataforma.</h2>
+    <ul>
+      <li data-rv><span><b>7 categorias por ocasião</b>: Só pra mim · Pra dois · Pra galera · Frango & Bites · Burgers · Almoço · Complete.</span></li>
+      <li data-rv><span><b>O maior vem primeiro</b>, como âncora, e o selo "Mais pedido" fica no do meio.</span></li>
+      <li data-rv><span><b>Os complementos vendem</b>: troca premium, molho extra, bebida R$ 2 mais barata no combo e doce.</span></li>
+      <li data-rv><span><b>Cardápio mestre</b>: 32 itens iguais nas 72 lojas, no lugar de 284 produtos.</span></li>
+    </ul>
+    <div class="rule" data-rv>REGRA: se o iFood não tem o recurso, fica no app.</div>
+  </div>
+  <div class="app">
+    <span class="eyebrow" data-rv>Visão App N1</span>
+    <h2 class="h-l" data-rv style="margin-top:14px">O que é ousado<br>fica em casa.</h2>
+    <ul>
+      <li data-rv><span><b>Assistente N1 com IA</b>: pergunta quantas pessoas vão comer e o tamanho da fome, e monta o pedido.</span></li>
+      <li data-rv><span><b>Modo Jogo</b>: combos com contagem regressiva para o apito.</span></li>
+      <li data-rv><span><b>N1 Points</b>: o cartão já começa com 2 selos.</span></li>
+      <li data-rv><span><b>Repetir o último pedido</b> em 1 toque.</span></li>
+    </ul>
+    <div class="rule" data-rv>O iFood apresenta. O app fideliza.</div>
+  </div>
+</section>
+
+<!-- ============ 7. CARDÁPIO NAVEGÁVEL ============ -->
+<section class="menu" id="cardapio">
+  <div class="wrap">
+    <div class="menu-head">
+      <div>
+        <span class="eyebrow" style="color:var(--r)" data-rv>Cardápio mestre N1 · todas as lojas · CMV ≤ 28%</span>
+        <h2 class="h-l" data-rv style="margin-top:14px">O novo cardápio.</h2>
+      </div>
+      <p class="lead" data-rv style="max-width:44ch">Toque em um item para ver os complementos como ficarão no iFood. Ou deixe o <b>Assistente N1</b>, a bolinha amarela, montar o pedido.</p>
+    </div>
+    <div class="menu-shell">
+      <aside class="cat-nav" id="catNav"></aside>
+      <div id="menuList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. APP + IA ============ -->
+<section class="app-sec grain" id="app">
+  <div class="wrap">
+    <span class="eyebrow" style="color:var(--y)" data-rv>Visão app próprio</span>
+    <h2 class="h-l" data-rv style="margin-top:14px">"Não sei o que comer."<br><span style="color:var(--y)">Agora sabe.</span></h2>
+    <div class="app-grid">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="scr">
+          <div class="app-top"><small>Boa noite! 👋</small><h5>Bateu a fome?</h5><div class="pts">N1 Points<br>2/10 ★</div></div>
+          <div class="app-body">
+            <div class="app-chip"><span class="on">Pra galera</span><span>Pra dois</span><span>Só pra mim</span><span>Almoço</span></div>
+            <div class="app-game"><div><small style="font-family:var(--round);font-weight:700;letter-spacing:.08em;font-size:11px;opacity:.7">MODO JOGO · COMEÇA EM</small><br><b id="gameClock">01:42:10</b></div><span class="pill">Combo G</span></div>
+            <div class="app-card"><div class="ph" id="apCard1"></div><div><em>Repetir último pedido</em><b>Combo M + 2 Cocas</b><span>111,70</span></div></div>
+            <div class="app-card"><div class="ph" id="apCard2"></div><div><em>Só no app · sem taxa</em><b>Combo G + Bites P</b><span>178,90</span></div></div>
+          </div>
+          <div class="chat" id="phoneChat"><div class="ch-h"><img alt="" src="https://static.ifood-static.com.br/image/upload/t_thumbnail/logosgde/8adf268a-29f7-4b0f-9952-db64720acd56/202607281749_IHL5.jpeg">Assistente N1</div><div class="ch-b" id="phoneChatBody"></div></div>
+          <button class="fab" id="phoneFab" aria-label="Abrir assistente"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M12 3c4.97 0 9 3.58 9 8s-4.03 8-9 8c-1.1 0-2.15-.17-3.12-.5L4 20l1.3-3.9C3.88 14.8 3 13 3 11c0-4.42 4.03-8 9-8z" fill="#1A0C05"/><circle cx="8.5" cy="11" r="1.3" fill="#FFED00"/><circle cx="12" cy="11" r="1.3" fill="#FFED00"/><circle cx="15.5" cy="11" r="1.3" fill="#FFED00"/></svg></button>
+        </div>
+      </div>
+      <div class="feat">
+        <div data-rv><div class="ic">IA</div><h4>Assistente N1</h4><p>No máximo 3 perguntas de um toque: pessoas, fome e ocasião. Depois, 3 opções com a do meio em destaque.</p></div>
+        <div data-rv><div class="ic">⚽</div><h4>Modo Jogo</h4><p>Em dia de jogo, o app abre com o Combo G e a contagem para o apito.</p></div>
+        <div data-rv><div class="ic">★</div><h4>N1 Points</h4><p>O cartão fidelidade já começa com 2 de 10 selos.</p></div>
+        <div data-rv><div class="ic">↺</div><h4>Pedir de novo</h4><p>Repetir o último pedido em 1 toque. É no app que acontece a recompra.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. VÍDEO ============ -->
+<section class="film" id="filme">
+  <div class="wrap">
+    <span class="eyebrow">Vídeo de apresentação</span>
+    <h2 class="h-l" style="margin-top:14px">O porquê,<br>em 88 segundos.</h2>
+    <div class="film-frame"><iframe src="video.html?embed=1" title="Vídeo de apresentação N1" allow="autoplay; fullscreen" allowfullscreen></iframe></div>
+    <div class="film-meta"><a class="pill red" href="video.html" target="_blank" rel="noopener">Abrir em tela cheia ↗</a><span>No celular, gire para a horizontal</span></div>
+  </div>
+</section>
+
+<!-- ============ 10. IMPACTO ============ -->
+<section class="impact grain" id="impacto">
+  <div class="wrap">
+    <span class="eyebrow" data-rv>Projeção conservadora · base setembro/2026 · conversão estável</span>
+    <h2 class="h-l" data-rv style="margin-top:14px">+R$ 255 mil<br><span style="color:var(--y)">de margem por mês.</span></h2>
+    <div class="imp-grid">
+      <div class="imp" data-rv><div class="from">CMV do mix 28,8% →</div><div class="to num">27,7%</div><div class="k">nenhum item acima de 28%</div></div>
+      <div class="imp" data-rv><div class="from">Ticket R$ 58,96 →</div><div class="to num">R$ 63,85</div><div class="k">+8,3%, com preços novos e complementos</div></div>
+      <div class="imp" data-rv><div class="from">GMV R$ 3,59 mi →</div><div class="to num">R$ 3,89 mi</div><div class="k">+R$ 298 mil/mês com o mesmo tráfego</div></div>
+    </div>
+    <div class="bridge" data-rv>
+      <h4>De onde vêm os +R$ 4,89 no ticket</h4>
+      <div id="bridgeRows"></div>
+    </div>
+    <div class="roll">
+      <div data-rv><b>Semana 0</b><h5>Cardápio mestre</h5><p>32 itens, preços em CMV 28% e fotos das sobremesas.</p></div>
+      <div data-rv><b>Semanas 1–4</b><h5>Piloto em 3 lojas</h5><p>Vitória, Guarapari e Uberaba contra 3 lojas-controle.</p></div>
+      <div data-rv><b>Semanas 5–6</b><h5>Ajuste</h5><p>Popularidade × margem em reais por item.</p></div>
+      <div data-rv><b>Semana 7+</b><h5>Rede + app</h5><p>72 lojas no iFood e o app com o Assistente N1.</p></div>
+    </div>
+    <p class="disc" data-rv>Premissas: pedidos de setembro/2026 (60.850) mantidos; preços novos aplicados ao mix real de jul–set (+4,1%); adesão aos complementos conforme a ponte acima, a validar no piloto. Se a conversão subir 0,8 p.p., o ganho de GMV chega a +R$ 563 mil/mês. Custos: planilha CMV 2026 (corte mais caro, com embalagem).</p>
+  </div>
+</section>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="big">Nº1.</div>
+    <p>N1 Chicken · Tastefy · Laboratório de IA · 2026</p>
+  </div>
+</footer>
+
+<!-- sacola / modal / assistente / lightbox -->
+<button class="bag-btn" id="bagBtn"><span class="c" id="bagCount">0</span><span id="bagTotal">R$ 0,00</span><span>Sacola</span></button>
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"></div>
+<aside class="bag" id="bag" aria-label="Sacola"></aside>
+<div class="lightbox" id="lightbox" role="dialog" aria-label="Print do iFood"><img alt=""><button aria-label="Fechar">×</button></div>
+
+<button class="ai-fab hint" id="aiFab" aria-label="Abrir Assistente N1"><img alt="" src="https://static.ifood-static.com.br/image/upload/t_thumbnail/logosgde/8adf268a-29f7-4b0f-9952-db64720acd56/202607281749_IHL5.jpeg"><span class="bub">Não sabe o que pedir? 🍗</span></button>
+<div class="ai-panel" id="aiPanel" role="dialog" aria-label="Assistente N1">
+  <div class="ch-h"><img alt="" src="https://static.ifood-static.com.br/image/upload/t_thumbnail/logosgde/8adf268a-29f7-4b0f-9952-db64720acd56/202607281749_IHL5.jpeg"><div>Assistente N1<small>Monto seu pedido em 10 segundos</small></div><button id="aiClose" aria-label="Fechar">×</button></div>
+  <div class="ch-b" id="aiBody"></div>
+  <div class="ch-f">Protótipo da visão app · sugestões do cardápio mestre</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="js/menu-data.js"></script>
+<script src="js/site.js"></script>
+</body>
+</html>
