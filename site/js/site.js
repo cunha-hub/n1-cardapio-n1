@@ -439,12 +439,7 @@
   $('#aiClose').onclick = closeAI;
   setTimeout(() => aiFab.classList.remove('hint'), 9000);
 
-  // demo automática dentro do celular
-  const pc = makeChat($('#phoneChatBody'), { auto: true });
-  $('#apCard1').style.backgroundImage = `url('${IMG.comboM}')`; $('#apCard2').style.backgroundImage = `url('${IMG.comboG}')`;
-  ScrollTrigger.create({ trigger: '.phone', start: 'top 70%', once: true, onEnter: () => setTimeout(() => { $('#phoneChat').classList.add('on'); pc.run([3, 1, 0]); }, 900) });
-  $('#phoneFab').onclick = () => $('#phoneChat').classList.toggle('on');
-  (() => { let s = 1 * 3600 + 42 * 60 + 10; setInterval(() => { s = s > 0 ? s - 1 : 7200; const h = String(Math.floor(s / 3600)).padStart(2, '0'), m = String(Math.floor(s % 3600 / 60)).padStart(2, '0'), x = String(s % 60).padStart(2, '0'); $('#gameClock').textContent = `${h}:${m}:${x}`; }, 1000); })();
+  // (a seção App + IA saiu do site; o Assistente N1 continua na bolinha do canto)
 
   /* ---------------- CMV 28%: dumbbell + tabela ---------------- */
   (() => {

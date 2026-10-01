@@ -11,7 +11,8 @@ Novo cardápio navegável de alta conversão para a N1 Chicken (Tastefy), com v�
 - **CMV 28%:** todo preço é o menor valor terminado em ,90 com (custo + embalagem) ÷ preço ≤ 28%. Os custos vêm da planilha *CMV 2026 – Nova Operação*.
 - **Cardápio no celular:** 7 categorias e 32 itens, com complementos iguais aos do iFood e sacola. No computador, ele aparece dentro de um celular (com QR code para abrir no seu); no celular, ocupa a tela inteira, como um app.
 - **Visão app:** Assistente N1 com IA (a bolinha no canto), Modo Jogo e N1 Points.
-- **Vídeo de apresentação (88 s):** feito em canvas, com trilha original em Web Audio. `site/video.html` tem o botão **Exportar .webm**.
+- **Vídeo de apresentação (86 s):** feito em canvas com a skill brag-motion (adaptação do [brag](https://github.com/latent-spaces/brag), MIT). Tem 8 transições da marca (`site/js/motion-transitions.js`) e cenas nas batidas da música. `site/video.html` tem o botão **Exportar .webm**.
+- **Trilha:** "Happy Beats / Business Moves vol. 1", de [ende.app](https://ende.app/en), da biblioteca do brag. Antes de redistribuir, confira a licença.
 - **Projeção:** com a conversão estável, +R$ 298 mil/mês de GMV e +R$ 255 mil/mês de margem bruta.
 
 ## Rodar localmente
