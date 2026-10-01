@@ -138,3 +138,96 @@ Regras que deveriam existir e teriam pego a maior parte dos problemas acima:
 - Se ocasião = almoço, pelo menos uma opção deve conter PF.
 - Se fome = beliscar e houver petisco que cubra a necessidade, ele deve aparecer.
 - `top.cap > rec.cap`.
+
+---
+
+# Rodada 2 (98 conversas, após as correções)
+
+Fontes: o novo `pesquisa/testes_assistente.md` (98 conversas), `site/js/assistente.js` atual, `site/js/site.js` (chat e sacola) e `site/index.html`.
+
+## Nota: **7/10** (era 6)
+
+Placar: **27 OK · 56 Atenção · 15 Problema**.
+
+**O que confirmei como resolvido:**
+- O `index.html` carrega `js/assistente.js` e o chat usa `N1Assist.plano`.
+- A troca Trio → 4 em N1 sai a R$ 51,90 em vez de R$ 52,80.
+- O limite de latas a preço de combo é respeitado, com o excedente avulso a R$ 13,90 dito no texto. Exemplo: Trinca + 4 latas = R$ 120,50.
+- O preço por pessoa usa o mesmo divisor em todas as opções.
+- O almoço sugere prato feito e avisa fora das 11h–15h (#97 e #98).
+- "Beliscar" usa o Chicken Bites P e o M.
+- Não aparece mais decimal quebrado, e a sacola não faz segunda oferta.
+
+Refiz as contas por amostragem (#13, #23, #37, #45, #57, #61, #65, #69, #73, #77, #81, #85, #89 e #93, incluindo os casos com latas avulsas) e todas batem.
+
+O que ainda pesa é sistêmico. Quase todos os 15 "Problema" têm a mesma causa (P1), e a maioria das "Atenção" vem do Completão sem ganho visível (P2) e das faixas de pessoas (P4).
+
+## Veredito por bloco
+
+| Conversas | Veredito | Motivo |
+|---|---|---|
+| 1, 2, 3, 4, 5, 6, 8, 9, 10, 12 | OK | Solo coerente. A troca pelo 4 em N1 é vantajosa. |
+| 7, 11 | Atenção | PF + batata aparece como "alimenta ~2" para 1 pessoa (P5). |
+| 15, 17, 18, 19, 20, 27, 31, 33, 34, 36, 39, 41, 42, 43, 44 | OK | Quantidade e preço coerentes; o Completão tem degrau visível. |
+| 13, 14, 16, 21, 22, 24, 25, 26, 28, 29, 30, 32, 37, 38, 40 | Atenção | O Completão "alimenta ~N" igual ao recomendado e custa R$ 17 a R$ 37 a mais (P2). Em #37–40, beliscar a 4 vira Trinca (3 burgers) na frente do Bites M. |
+| 23, 35, 47, 59, 71, 83, 95 | Atenção | Almoço com fome de campeão: "3× PF + 3× batata alimenta ~5" exagera a capacidade (P5). |
+| 51, 55, 63, 67, 75, 79, 87, 91 | Atenção | Almoço por faixa: "5 a 6" gera 6 PFs, "11 ou mais" gera 12. Se forem 5 (ou 20), sobra ou falta prato (P4). |
+| 45, 46, 48, 49, 50, 52, 57, 58, 60, 65, 66, 68, 69, 70, 72, 73, 74, 76, 77, 78, 80, 93, 94, 96 | Atenção | Recomendado em "N× Combo M": a comida real fica 4–8% abaixo da necessidade, ou o Completão tem o mesmo "~N" (P1, P2). Latas e brigadeiros calculados pelo topo da faixa (P4). |
+| 53, 54, 56, 61, 62, 64, 81, 82, 84, 85, 86, 88, 89, 90, 92 | **Problema** | Recomendado em "N× Combo M" com comida real **13–17% abaixo** da necessidade: 2× M para 6 pessoas, 3× M para 9, 4× M para 12, 3× M + G para 13,5 (P1). |
+| 97, 98 | OK | Aviso de horário certo e combos coerentes. |
+
+## Problemas restantes (máx. 5)
+
+**P1. A capacidade do Combo M está superestimada, então "N× Combo M" domina todos os grupos grandes.**
+
+`CAP['combo-m'] = 3.1` para um combo que o cardápio vende como "serve 2 a 3". O Combo G (serve 3 a 5) usa 4,2 e o Combo GG (serve 5 a 7) usa 6,3, ou seja, o meio da faixa. O Combo M usa acima do topo. Pela composição, a conta não fecha:
+- O GG é Caixa G + Caixa M e o Combo M é Caixa M + acompanhamento. Logo, 2× Combo M tem uma porção de frango a menos que o GG, mas a lógica dá aos dois quase a mesma capacidade (6,2 contra 6,3).
+
+Efeitos:
+- O assistente recomenda 2×, 3× ou 4× Combo M em 40+ conversas (todas as de 4 com fome de campeão e de 5 pessoas para cima).
+- Com o Combo M no meio da faixa (2,5), a comida real fica 13–17% abaixo da necessidade em 15 casos. Exemplos: 6 pessoas com fome normal levam 2× M (5,0); 12 pessoas levam 4× M (10).
+- O Combo GG, carro-chefe "pra galera", nunca é recomendado.
+- A cozinha monta 3 ou 4 caixas M em vez de uma G ou GG, com mais embalagem.
+
+**Correção:**
+- Recalibrar a capacidade por componente: porção de caixa P = 1, M = 2, G = 3; acompanhamento Super ≈ 0,5. Isso dá `combo-m: 2.5`, `combo-g: 4.0`, `combo-gg: 6.0` (ou manter 4,2 e 6,3 e pôr só o M em 2,5).
+- Desempatar por menos caixas: no `sort`, penalizar cada combo adicional em uns 3%.
+- Acrescentar ao teste: `cap(GG) ≈ cap(G) + cap(Caixa M)` e `cap(2× M) < cap(GG)`.
+
+**P2. O Completão muitas vezes não alimenta mais do que o recomendado, pelo número que o cliente vê.**
+
+A regra `top.cap >= rec.cap` aceita +0,1 de capacidade. Em 36 conversas, o cartão mostra "alimenta ~N" igual nas duas opções e o Completão custa R$ 17 a R$ 37 a mais. Exemplos:
+- Combo M ~3 contra Trinca ~3 (#21, #29).
+- GG ~6 contra 2× M ~6 (#45 a #64).
+- M + GG ~9 contra 3× M ~9 (#57, #73, #85).
+- Dupla ~2 contra Bites P ~2 (#13).
+
+**Correção:** só mostrar o Completão se `alimenta(top) > alimenta(rec)` (em pessoas inteiras) ou se ele trouxer algo que o recomendado não tem (bebida, doce, acompanhamento). Caso contrário, omitir. Acrescentar ao teste: `p.alimenta(top) > p.alimenta(rec) || top.bebidas + top.doces > rec.bebidas + rec.doces`.
+
+**P3. Na tela, o Completão não pode ser escolhido quando existe "Mais em conta".**
+
+`site.js` (linhas 403–404) mostra 3 cartões, mas só 2 botões: "Quero o recomendado" e "Quero o mais em conta". O botão "Quero o completão" só aparece quando não há opção mais barata. O cliente que quer a opção maior não consegue escolhê-la, e o extra calculado para ela nunca é oferecido.
+
+**Correção:** tornar cada cartão clicável (ou um botão por papel: "Completão / O que eu levaria / Mais em conta") e chamar `pl.extra(escolhido)` para a opção tocada.
+
+**P4. Itens "por pessoa" usam o topo da faixa, e não há como dizer "já tenho bebida".**
+
+- "5 a 6" vira sempre 6 PFs, 6 latas e 6 brigadeiros "pra cada um"; "7 a 8" vira 8; "11 ou mais" fica fixo em 12. Um grupo de 20 recebe comida e bebida para 12.
+- A única sugestão chega a 12 latas por R$ 148,80, com 3 avulsas a R$ 13,90 (#85). Em grupos pequenos beliscando, as latas pesam 65–77% da comida (#13: R$ 23,80 sobre R$ 30,90; #25: R$ 35,70 sobre R$ 54,90).
+- Os botões continuam só "Bora! / Não, valeu".
+
+**Correção:**
+- Para "5 ou mais", trocar as faixas por um seletor de número exato (5…20+). O número exato só é indispensável quando entram itens por pessoa (PF, lata, brigadeiro).
+- Na bebida, oferecer [Bora, N latas] [Só metade] [Já tenho bebida]. "Já tenho bebida" passa a sugestão, uma única vez, para o molho extra (R$ 6,90).
+- Nunca incluir latas avulsas na sugestão: limitar a `limBebida` e escrever "dá pra pôr mais na sacola".
+
+**P5. Almoço engessado e capacidade exibida de forma enganosa.**
+
+- O almoço sai sempre como "N× Frango à Parmegiana", só porque é o primeiro no desempate de R$ 30,90. O Tradicional, que tem o selo "Mais pedido no almoço", nunca aparece. Quase sempre há uma opção só, e 12 pessoas recebem o mesmo prato.
+- `alimenta = Math.round(cap)` exagera: "PF + batata alimenta ~2" para 1 pessoa (#7, #11); "12× PF alimenta ~13" (#87).
+- A abertura "quem pede comigo costuma levar isto:" continua em cerca de um terço das conversas, inclusive quando há uma opção só (#87). É prova social sem dado por trás.
+
+**Correção:**
+- No almoço, oferecer "N× Prato feito N1 (cada um escolhe o seu)", com o Tradicional como padrão (é o mais pedido). Usar "+ batata pra quem tá com fome de campeão" como Completão.
+- Exibir capacidade como `Math.floor(cap)` ou "bem servido pra N", e para PF mostrar "N pratos".
+- Trocar a frase de prova social por algo honesto, como "Fiz as contas e eu iria nisso:".

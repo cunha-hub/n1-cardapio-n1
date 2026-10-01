@@ -390,7 +390,7 @@
       await bot('Quantas pessoas vão comer?', 500);
       const pessoas = await ask(AS.GRUPO.map(g => g.label), pick[0]);
       let grande = null;
-      if (AS.GRUPO[pessoas].grande) { await bot('Opa, galera! Mais ou menos quantas pessoas?', 450); grande = await ask(AS.GRANDE.map(g => g.label), pick[3] || 0); }
+      if (AS.GRUPO[pessoas].grande) { await bot('Opa, galera! Quantas pessoas?', 450); grande = await ask(AS.GRANDE.map(g => g.label), pick[3] || 0); }
       await bot('E o tamanho da fome? \u{1f605}');
       const fome = await ask(AS.FOME.map(f => f.label), pick[1]);
       await bot('É pra quê?');
@@ -400,18 +400,21 @@
       const rec = document.createElement('div'); rec.className = 'rec msg';
       rec.innerHTML = pl.opcoes.map(x => '<div class="o ' + (x.o === pl.rec ? 'best' : '') + '"><div class="ph" style="background-image:url(\'' + x.o.img + '\')"></div><div><b>' + x.o.nome + '</b><small>' + x.papel + ' · ' + 'alimenta ~' + pl.alimenta(x.o) + ' - ' + brl(pl.porPessoa(x.o)) + '/pessoa</small></div><span class="pz">' + brl(x.o.price) + '</span></div>').join('');
       body.appendChild(rec); scroll();
-      const alt = pl.econ || pl.top;
-      const c = await ask(alt ? ['Quero o recomendado', pl.econ ? 'Quero o mais em conta' : 'Quero o completão'] : ['Quero esse'], 0);
-      const chosen = c === 0 ? pl.rec : alt;
+      // um botão para cada opção (recomendado primeiro)
+      const escolhas = [pl.rec, pl.top, pl.econ].filter(Boolean);
+      const rotulo = o => o === pl.rec ? (escolhas.length > 1 ? 'Quero o recomendado' : 'Quero esse') : o === pl.top ? 'Quero o completão' : 'Quero o mais em conta';
+      const chosen = escolhas[await ask(escolhas.map(rotulo), pick[4] || 0)];
       const ex = pl.extra(chosen);
       await bot(ex.texto);
-      const up = await ask(['Bora!', 'Não, valeu'], 0);
-      const final = up === 0 && ex.tipo === 'troca' ? ex.troca : chosen;
-      const somaExtra = up === 0 && ex.tipo !== 'troca' ? ex.total : 0;
+      const b = ex.botoes[await ask(ex.botoes.map(x => x.label), 0)];
+      const aceitou = b.qtd > 0;
+      const final = aceitou && ex.tipo === 'troca' ? ex.troca : chosen;
+      const somaExtra = aceitou && ex.tipo !== 'troca' ? b.total : 0;
+      const nomeExtra = somaExtra ? b.nome : '';
       const total = Math.round((final.price + somaExtra) * 100) / 100;
-      if (!auto && opts.onAdd) final.ids.forEach((id, k) => { const it = byId(id); opts.onAdd(it, it.price + (k === 0 ? somaExtra : 0), ['Montado pelo Assistente N1'].concat(k === 0 && somaExtra ? [ex.nome] : [])); });
-      await bot('Fechado! <b>' + final.nome + '</b>' + (somaExtra ? ' + ' + ex.nome : '') + ' = <b>' + brl(total) + '</b>. ' + (auto ? 'Chega em 35–45 min. Te aviso: empanando → fritando → saiu \u{1f6f5}' : 'Já coloquei na sua sacola \u{1f609}'), 800);
-      if (auto) { await wait(3200); return run([[3, 2, 0], [0, 1, 1], [1, 0, 1], [4, 1, 0, 1]][Math.floor(Math.random() * 4)]); }
+      if (!auto && opts.onAdd) final.ids.forEach((id, k) => { const it = byId(id); opts.onAdd(it, it.price + (k === 0 ? somaExtra : 0), ['Montado pelo Assistente N1'].concat(k === 0 && nomeExtra ? [nomeExtra] : [])); });
+      await bot('Fechado! <b>' + final.nome + '</b>' + (nomeExtra ? ' + ' + nomeExtra : '') + ' = <b>' + brl(total) + '</b>. ' + (auto ? 'Chega em 35–45 min. Te aviso: empanando → fritando → saiu \u{1f6f5}' : 'Já coloquei na sua sacola \u{1f609}'), 800);
+      if (auto) { await wait(3200); return run([[3, 2, 0], [0, 1, 1], [1, 0, 1], [4, 1, 0, 3]][Math.floor(Math.random() * 4)]); }
       const again = document.createElement('div'); again.className = 'qr';
       again.innerHTML = '<button>Montar outro</button><button>Ver sacola</button>';
       again.children[0].onclick = () => run();
