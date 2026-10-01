@@ -125,6 +125,8 @@
     .to({}, { duration: 0.06 });
   if (mobileHero) {
     heroTl.scrollTrigger.kill(); heroTl.kill();
+    // a timeline do desktop já aplicou o estado inicial (rotação do selo, deslocamento dos textos): limpa antes de montar a do celular
+    gsap.set(['#heroSeal', '#heroTitle .ch', '#heroSub', '#heroMedia', '#cue', '#finL', '#finR'], { clearProps: 'transform,opacity,borderRadius,rotate,scale,x,y' });
     const mt = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom bottom', scrub: 0.6,
       onUpdate: s => { heroProgress = s.progress; if (useVideo && video.duration) vTarget = Math.min(1, s.progress / 0.62) * (video.duration - 0.05); } } });
     mt.to('#heroTitle .ch', { yPercent: -120, opacity: 0, stagger: 0.03, duration: 0.18 }, 0.14)

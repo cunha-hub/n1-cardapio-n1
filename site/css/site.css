@@ -38,7 +38,7 @@ section { position: relative; }
 /* ---------- loader ---------- */
 #loader { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: var(--y); transition: clip-path 1s var(--ease); clip-path: inset(0 0 0 0); }
 #loader.out { clip-path: inset(0 0 100% 0); }
-#loader .seal { width: 150px; height: 150px; animation: spin 2.4s linear infinite; }
+#loader .seal { width: 150px; height: 150px; animation: spin 2.4s linear infinite; clip-path: circle(45.6% at 49.7% 49.7%); }
 #loader .bar { position: absolute; bottom: 12vh; width: 180px; height: 4px; background: rgba(0,0,0,.12); border-radius: 4px; overflow: hidden; }
 #loader .bar i { display: block; height: 100%; width: 0; background: var(--r); transition: width .3s; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -73,7 +73,9 @@ section { position: relative; }
 .hero-copy .t1 .ch { display: inline-block; will-change: transform, opacity; }
 .hero-copy .t2 { margin-top: 18px; font-family: var(--round); font-weight: 700; letter-spacing: .3em; text-transform: uppercase; font-size: clamp(12px, 1.2vw, 16px); }
 .hero-seal { position: absolute; left: 50%; top: 50%; width: min(38vh, 70vw); height: min(38vh, 70vw); transform: translate(-50%, -50%) scale(0); z-index: 3; will-change: transform; }
-.hero-seal img { width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 30px 90px rgba(0,0,0,.35); }
+/* a arte do iFood é um quadrado com cantos brancos: o círculo recorta e a imagem amplia 9,6% para o vermelho tocar a borda */
+.hero-seal { border-radius: 50%; overflow: hidden; background: #E2231A; box-shadow: 0 30px 90px rgba(0,0,0,.35); }
+.hero-seal img { width: 100%; height: 100%; display: block; transform: scale(1.096); transform-origin: 49.7% 49.7%; }
 .hero-final { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; z-index: 4; pointer-events: none; }
 .hero-final > div { display: flex; flex-direction: column; justify-content: center; padding: 0 5vw; opacity: 0; }
 .hero-final .fl { color: var(--ink); align-items: flex-start; }
@@ -361,3 +363,6 @@ section { position: relative; }
 [data-rv] { opacity: 0; transform: translateY(40px); }
 .rv-in { opacity: 1 !important; transform: none !important; transition: opacity .9s var(--ease), transform .9s var(--ease); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } [data-rv] { opacity: 1; transform: none; } }
+
+/* logos redondos pequenos: corta a margem branca da arte quadrada do iFood */
+.nav img, .chat .ch-h img, .ai-fab img, .ai-panel .ch-h img { object-view-box: inset(4%); }
