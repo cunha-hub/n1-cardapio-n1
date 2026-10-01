@@ -12,8 +12,7 @@
     { n: 4, label: '4', txt: 'Pra quatro' },
     { n: null, label: '5 ou mais', grande: true }
   ];
-  const GRANDE = [5, 6, 7, 8, 9, 10, 11, 12].map(n => ({ n, label: String(n), txt: 'Pra ' + n + ' pessoas' }))
-    .concat([{ n: 15, label: '13 ou mais', txt: 'Pra galera grande (conto 15)' }]);
+  const GRANDE = [5, 6, 7, 8, 9, 10, 11, 12, 15, 20, 25, 30].map(n => ({ n, label: n > 12 ? '~' + n : String(n), txt: 'Pra ' + (n > 12 ? 'umas ' : '') + n + ' pessoas' }));
   const FOME = [
     { f: 0.75, label: 'Beliscar', txt: ' só pra beliscar' },
     { f: 1, label: 'Fome normal', txt: '' },
@@ -53,18 +52,22 @@
   function candidatos(menu, n, fome, oc, need) {
     const k = Object.keys(CAP), L = [];
     if (oc === 'almoco') { // almoço: prato feito pra cada um (+ batata individual pra quem tá com fome de campeão)
-      const pf = o => Object.assign(o, { nome: o.nome.replace(/(d+× )?Tradicional N1/, (m, q) => (q || (n > 1 ? n + '× ' : '')) + 'Prato feito N1' + (n > 1 ? ' (cada um escolhe o seu)' : ' (Tradicional, Parmegiana ou Frito com Salada)')) });
+      const pf = o => Object.assign(o, { prato: true, nome: o.nome.replace(/(\d+× )?Tradicional N1/, (m, q) => (q || '') + 'Prato feito N1' + (n > 1 ? ' (cada um escolhe o seu)' : ' (Tradicional, Parmegiana ou Frito com Salada)')) });
       L.push(Array(n).fill('tradicional')); L.push(Array(n).fill('tradicional').concat(Array(n).fill('batata')));
       return L.map(ids => pf(montar(menu, ids)));
     }
     if (n === 1) {
       k.filter(id => CAP[id].solo).forEach(id => L.push([id]));
     } else {
-      k.filter(id => CAP[id].grupo || (fome === 0 && CAP[id].petisco)).forEach(id => L.push([id]));
-      if (need > 4.2) { // combinações para grupos grandes (até 4 combos)
+      const G = k.filter(id => CAP[id].grupo);
+      G.forEach(id => L.push([id]));
+      if (fome === 0) k.filter(id => CAP[id].petisco).forEach(id => L.push([id]));
+      // degraus intermediários (ex.: 3–4 pessoas): um combo + Chicken Bites pra completar
+      G.filter(id => id !== 'dupla-bites').forEach(id => ['bites-p', 'bites-m'].forEach(b => L.push([id, b])));
+      if (need > 4) { // grupos grandes: combinações de combos de frango (até 8)
         const M = k.filter(id => CAP[id].multi);
         const gera = (pre, from, left) => { if (pre.length >= 2) L.push(pre.slice()); if (!left) return; for (let i = from; i < M.length; i++) { pre.push(M[i]); gera(pre, i, left - 1); pre.pop(); } };
-        gera([], 0, 4);
+        gera([], 0, 8);
       }
     }
     return L.map(ids => montar(menu, ids));
@@ -77,14 +80,18 @@
     const hora = resp.hora == null ? 12 : resp.hora;
     if (oc.id === 'almoco' && (hora < 11 || hora >= 15)) { nota = 'O almoço N1 sai das 11h às 15h, então agora te mostro os combos 😉 '; oc = OCASIAO[3]; }
     const n = g.n, need = r2(n * fo.f);
-    const ops = candidatos(menu, n, resp.fome, oc.id, need).sort((a, b) => a.price - b.price || a.ids.length - b.ids.length || b.cap - a.cap);
-    const rec = ops.find(o => o.cap >= need) || ops[ops.length - 1];
-    const econ = ops.filter(o => o.price < rec.price && o.cap >= need * 0.8).sort((a, b) => b.cap - a.cap || a.price - b.price)[0] || null;
-    const inteiro = c => Math.max(1, Math.floor(c + 0.25)); // 1,8 → 2 · 1,55 → 1 · 2,5 → 2
+    // ordenação: preço + R$ 8 por caixa extra (menos embalagens é melhor); o preço exibido continua o real
+    const custo = o => o.price + 8 * (o.ids.filter(id => CAP[id].multi || CAP[id].grupo).length - 1);
+    const ops = candidatos(menu, n, resp.fome, oc.id, need).sort((a, b) => custo(a) - custo(b) || b.cap - a.cap);
+    const basta = need * (n <= 6 ? 0.97 : 1); // 97% da necessidade já resolve em grupos pequenos
+    const rec = ops.find(o => o.cap >= basta) || ops[ops.length - 1];
+    const econ = ops.filter(o => o.price <= rec.price * 0.92 && o.cap >= need * 0.8).sort((a, b) => b.cap - a.cap || a.price - b.price)[0] || null;
+    // "alimenta" contado na fome escolhida: Chicken Bites P dá pra ~2 beliscando
+    const inteiro = c => Math.max(1, Math.floor(c / fo.f + 0.4));
     const vale = o => inteiro(o.cap) > inteiro(rec.cap) || o.bebidas > rec.bebidas || o.doces > rec.doces;
-    const top = ops.find(o => o.price >= rec.price * 1.12 && o.cap >= need && o.cap >= rec.cap && o.cap <= need * 1.6 && o.ids.length <= rec.ids.length + 1 && vale(o)) || null;
+    const top = ops.find(o => o.price >= rec.price * 1.12 && o.price <= rec.price * 1.6 && o.cap >= need && o.cap >= rec.cap && o.cap <= need * 1.6 && o.ids.length <= rec.ids.length + 1 && vale(o)) || null;
     const porPessoa = o => r2(o.price / n);             // mesmo divisor para todas as opções
-    const alimenta = o => inteiro(o.cap); // em pessoas inteiras, sem inflar
+    const alimenta = o => inteiro(o.cap); // pessoas inteiras, na fome escolhida
 
     function extra(o) { // uma única sugestão, coerente com a ocasião e com o que já vem incluso
       const querBebida = oc.id === 'jogo' || oc.id === 'almoco' || oc.id === 'pular';

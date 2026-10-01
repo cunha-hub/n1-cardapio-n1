@@ -231,3 +231,99 @@ A regra `top.cap >= rec.cap` aceita +0,1 de capacidade. Em 36 conversas, o cart�
 - No almoço, oferecer "N× Prato feito N1 (cada um escolhe o seu)", com o Tradicional como padrão (é o mais pedido). Usar "+ batata pra quem tá com fome de campeão" como Completão.
 - Exibir capacidade como `Math.floor(cap)` ou "bem servido pra N", e para PF mostrar "N pratos".
 - Trocar a frase de prova social por algo honesto, como "Fiz as contas e eu iria nisso:".
+
+---
+
+# Rodada 3 (158 conversas, após as correções da rodada 2)
+
+Fontes: o `pesquisa/testes_assistente.md` regerado (158 conversas), `site/js/assistente.js` e `site/js/site.js` atuais.
+
+## Nota: **6,5/10**
+
+Placar: **56 OK · 57 Atenção · 45 Problema**.
+
+A nota não sobe, apesar dos avanços, por três motivos:
+- Um erro de digitação numa regex quebra o nome do prato feito nas 36 conversas de almoço em grupo.
+- A recalibração das capacidades abriu um buraco de preço justamente na faixa de 3–4 pessoas, a mais comum no delivery.
+- O "alimenta ~N" passou a mostrar, no beliscar, menos gente do que o grupo.
+
+Corrigidos os pontos 1 a 3 abaixo, a estimativa é **8–8,5**.
+
+**Conferido e OK nesta rodada:**
+- Um botão por opção, com o extra calculado para a opção tocada (`site.js`, linha 405).
+- Sugestão só com latas a preço de combo, com "(é o que cabe no preço de combo)" quando falta (#85, #109, #145).
+- Botões [Bora, N latas] [Só N/2] [Já tenho bebida].
+- Número exato para "5 ou mais".
+- Combo GG voltando a ser recomendado (#65, #73, #85, #137).
+- Completão sem "mesmo ~N".
+- Abertura "fiz as contas e eu iria nisso".
+
+Amostra de contas (#13, #23, #33, #45, #57, #61, #85, #109, #117, #129, #141, #145, #147, #153): tudo bate, inclusive o limite de latas por combo (ex.: 3× M + G = 14 latas).
+
+## Veredito por bloco
+
+| Conversas | Veredito | Motivo |
+|---|---|---|
+| 1–12 | OK | Solo coerente. Troca pelo 4 em N1. PF individual. |
+| 17, 18, 20 · 41, 42, 44 · 53, 54, 56 · 57, 58, 60 · 65, 66, 68 · 77, 78, 80 · 81, 82, 84 · 89, 90, 92 · 101, 102, 104 · 105, 106, 108 · 113, 114, 116 · 129, 130, 132 · 137, 138, 140 · 141, 142, 144 · 157, 158 | OK | Quantidade na medida, escada de preço clara, latas dentro do limite. |
+| 13, 14, 16 · 25, 26, 28 · 49, 50, 52 · 61, 62, 64 · 73, 74, 76 · 85, 86, 88 · 97, 98, 100 · 109, 110, 112 · 121, 122, 124 · 133, 134, 136 · 145, 146, 148 | Atenção | No beliscar, o recomendado "alimenta ~N" com N menor que o grupo: Bites P "~1" para 2, GG "~6" para 8, 3× M + G "~11" para 15 (ponto 3). |
+| 21, 22, 24 · 45, 46, 48 | Atenção | Completão exagerado: Combo G (serve 3 a 5) por R$ 148,90 para 2 pessoas (2,1× o preço do recomendado); 2× Combo G por R$ 297,80 para 4 (R$ 74/pessoa). O #45 aparece na demo automática do celular (ponto 4). |
+| 69, 70, 72 · 93, 94, 96 · 117, 118, 120 · 125, 126, 128 · 153, 154, 156 | Atenção | "Mais em conta" só R$ 3 mais barato que o recomendado (ponto 4). |
+| 149, 150, 152 | Atenção | "13 ou mais" fixo em 15 (é dito no texto, mas 25 pessoas recebem 60% da comida). |
+| 29, 30, 32 | **Problema** | 3 pessoas com fome normal levam Combo G por R$ 148,90 (R$ 49,63/pessoa, sobra 33%). O degrau anterior é a Trinca por R$ 70,90, e não há nada no meio (ponto 2). |
+| 33, 34, 36 | **Problema** | 3 com fome de campeão levam Combo GG por R$ 212,90 (**R$ 70,97/pessoa**, sobra 48%). O Combo G cobre 4,0 de 4,05 (99%) e fica como "Mais em conta" (ponto 2). |
+| 37, 38, 40 | **Problema** | 4 beliscando recebem o mesmo Combo G de 4 com fome normal (R$ 148,90). A resposta "Beliscar" não muda nada (ponto 2). |
+| 15, 19, 23, 27, 31, 35, 39, 43, 47, 51, 55, 59, 63, 67, 71, 75, 79, 83, 87, 91, 95, 99, 103, 107, 111, 115, 119, 123, 127, 131, 135, 139, 143, 147, 151, 155 | **Problema** | Nome quebrado "2× 2× Prato feito N1 (cada um escolhe o seu)" no cartão, no "Fechado!" e no fechamento (ponto 1). |
+
+## Pontos restantes (máx. 5)
+
+**1. BLOQUEANTE para apresentação: "N× N× Prato feito N1" em todo almoço em grupo.**
+
+Em `assistente.js`, linha 56, a regex é `/(d+× )?Tradicional N1/`. Falta a barra: `d+` casa a letra "d", não um dígito. O prefixo "2× " nunca é capturado e acaba duplicado. Aparece no cartão, na mensagem "Fechado!" do chat e no fechamento das 36 conversas.
+
+Há também um efeito na sacola: o site adiciona N× "Tradicional N1" (`final.ids.forEach`), o que contradiz o "cada um escolhe o seu". A Parmegiana e o Frito com Salada custam R$ 30,90, então o total fica R$ 1 por pessoa acima se escolherem esses pratos.
+
+**Correção:**
+- Trocar por `/(\d+× )?Tradicional N1/`.
+- Na sacola, lançar uma linha "N× Prato feito N1 (escolha os pratos)" que abre o detalhe para escolher cada um, ou mostrar o preço "a partir de R$ 30,90".
+- Acrescentar ao teste `chk(!/(\d+× ){2}/.test(o.nome), 'multiplicador duplicado')`.
+
+**2. Buraco de preço na faixa de 3–4 pessoas (#29–40).**
+
+Com as capacidades novas, não existe nada entre a Trinca (2,7 · R$ 70,90) e o Combo G (4,0 · R$ 148,90). As combinações só são geradas acima de 4,2 de necessidade e só com M, G e GG. Resultado:
+- 3 pessoas com fome normal pagam R$ 49,63 por pessoa.
+- 3 com fome de campeão pagam R$ 70,97 por pessoa (Combo GG), quando o Combo G cobre 99% da necessidade.
+- 4 beliscando pagam o mesmo que 4 com fome normal.
+
+**Correção:**
+- Tolerância no recomendado: `rec = ops.find(o => o.cap >= need * 0.97)`. Só isso já leva o caso de 3 com fome de campeão para o Combo G.
+- Gerar candidatos intermediários com o que o cardápio já tem:
+  - Combo M + Chicken Bites P (4,0 · R$ 118,80)
+  - Trinca + Chicken Bites P (4,2 · R$ 101,80)
+  - Combo M + batata individual (2,95 · R$ 95,80), ou o "turbo" do próprio combo
+- Teste: com n ≤ 4, `rec.cap <= need * 1.35`.
+
+**3. "Alimenta ~N" medido em pessoas com fome normal (33 conversas, inclusive a demo automática "2 · Beliscar · Série").**
+
+No beliscar, o cartão recomendado mostra menos gente do que o grupo: "Chicken Bites P · alimenta ~1" para 2 pessoas, "Combo GG ~6" para 8, "3× Combo M + Combo G ~11" para 15. A Trinca (3 burgers) aparece como "~2". O cliente lê que vai faltar comida.
+
+**Correção:**
+- Exibir `inteiro(cap / fo.f)` ("dá pra ~2 beliscando"), na mesma unidade da necessidade. Isso também corrige "PF + batata ~3" para 2 pessoas com fome de campeão.
+- Para burgers, mostrar a contagem ("3 burgers").
+- Teste: `p.alimenta(p.rec) >= p.n`.
+
+**4. Completão exagerado e "Mais em conta" que não economiza.**
+
+- O Completão para 2 pessoas com fome de campeão é o Combo G (serve 3 a 5) por R$ 148,90, 2,1× o preço do recomendado.
+- Para 4 com fome de campeão, é 2× Combo G por R$ 297,80 (R$ 74/pessoa). Esse caso aparece na demo automática do celular (`pc.run([3, 2, 0])`).
+- Em 15 conversas, o "Mais em conta" é só R$ 3 mais barato (R$ 297,80 contra R$ 300,80; R$ 723,60 contra R$ 726,60).
+
+**Correção:** `top.price <= rec.price * 1.6` e `econ.price <= rec.price * 0.92`; se não passar, omitir. Vale trocar a demo automática para um caso "limpo", como "4 · Fome normal · Jogo" (#41).
+
+**5. Grupos grandes: muitas caixas e teto em 15.**
+
+O desempate por número de combos só vale quando o preço empata. Por isso, 10 pessoas com fome normal levam 4× Combo M (R$ 351,60, 4 caixas) em vez de G + GG (R$ 361,80, 2 caixas). E 12 com fome de campeão levam 4 combos de 3 tamanhos diferentes. "13 ou mais" conta sempre 15.
+
+**Correção:** penalizar cada combo adicional no `sort` com cerca de R$ 8 (embalagem e montagem); o preço exibido continua o real. Para 13+, um seletor 13–30. Não é bloqueante.
+
+**Resumo para a apresentação:** o ponto 1 é bloqueante, porque é visível em qualquer teste de almoço com 2 ou mais pessoas. O ponto 2 é bloqueante se houver teste ao vivo com 3 ou 4 pessoas (não aparece na demo automática). Os pontos 3 e 4 aparecem na demo automática e convém corrigir antes, mas não quebram a apresentação. O ponto 5 pode esperar.

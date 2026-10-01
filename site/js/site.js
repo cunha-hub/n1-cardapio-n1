@@ -412,7 +412,15 @@
       const somaExtra = aceitou && ex.tipo !== 'troca' ? b.total : 0;
       const nomeExtra = somaExtra ? b.nome : '';
       const total = Math.round((final.price + somaExtra) * 100) / 100;
-      if (!auto && opts.onAdd) final.ids.forEach((id, k) => { const it = byId(id); opts.onAdd(it, it.price + (k === 0 ? somaExtra : 0), ['Montado pelo Assistente N1'].concat(k === 0 && nomeExtra ? [nomeExtra] : [])); });
+      if (!auto && opts.onAdd) { // agrupa itens iguais numa linha só (ex.: "4× Prato feito N1")
+        const cont = {}; final.ids.forEach(id => cont[id] = (cont[id] || 0) + 1);
+        Object.keys(cont).forEach((id, k) => {
+          const it = byId(id), q = cont[id], prato = final.prato && id === 'tradicional';
+          const nome = (q > 1 ? q + '× ' : '') + (prato ? 'Prato feito N1' : it.name);
+          const notas = ['Montado pelo Assistente N1'].concat(prato ? ['Cada um escolhe: Tradicional, Parmegiana ou Frito com Salada (esses dois saem R$ 1,00 a menos)'] : [], k === 0 && nomeExtra ? [nomeExtra] : []);
+          opts.onAdd(Object.assign({}, it, { name: nome }), Math.round((it.price * q + (k === 0 ? somaExtra : 0)) * 100) / 100, notas);
+        });
+      }
       await bot('Fechado! <b>' + final.nome + '</b>' + (nomeExtra ? ' + ' + nomeExtra : '') + ' = <b>' + brl(total) + '</b>. ' + (auto ? 'Chega em 35–45 min. Te aviso: empanando → fritando → saiu \u{1f6f5}' : 'Já coloquei na sua sacola \u{1f609}'), 800);
       if (auto) { await wait(3200); return run([[3, 2, 0], [0, 1, 1], [1, 0, 1], [4, 1, 0, 3]][Math.floor(Math.random() * 4)]); }
       const again = document.createElement('div'); again.className = 'qr';
@@ -434,7 +442,7 @@
   // demo automática dentro do celular
   const pc = makeChat($('#phoneChatBody'), { auto: true });
   $('#apCard1').style.backgroundImage = `url('${IMG.comboM}')`; $('#apCard2').style.backgroundImage = `url('${IMG.comboG}')`;
-  ScrollTrigger.create({ trigger: '.phone', start: 'top 70%', once: true, onEnter: () => setTimeout(() => { $('#phoneChat').classList.add('on'); pc.run([3, 2, 0]); }, 900) });
+  ScrollTrigger.create({ trigger: '.phone', start: 'top 70%', once: true, onEnter: () => setTimeout(() => { $('#phoneChat').classList.add('on'); pc.run([3, 1, 0]); }, 900) });
   $('#phoneFab').onclick = () => $('#phoneChat').classList.toggle('on');
   (() => { let s = 1 * 3600 + 42 * 60 + 10; setInterval(() => { s = s > 0 ? s - 1 : 7200; const h = String(Math.floor(s / 3600)).padStart(2, '0'), m = String(Math.floor(s % 3600 / 60)).padStart(2, '0'), x = String(s % 60).padStart(2, '0'); $('#gameClock').textContent = `${h}:${m}:${x}`; }, 1000); })();
 
