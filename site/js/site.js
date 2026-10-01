@@ -256,25 +256,35 @@
     box.addEventListener('scroll', () => { const i = Math.round(box.scrollLeft / (flips[0].offsetWidth + 14)); $$('i', dots).forEach((d, k) => d.classList.toggle('on', k === i)); }, { passive: true });
   })();
 
-  /* ---------------- CARDÁPIO ---------------- */
-  const nav = $('#catNav'), list = $('#menuList');
-  nav.innerHTML = categories.map((c, i) => `<button data-cat="${c.id}" class="${i ? '' : 'on'}"><span class="e">${c.emoji}</span><span>${c.name}</span></button>`).join('') +
-    `<p class="note"><b>${categories.reduce((s, c) => s + c.items.length, 0)} itens</b> em ${categories.length} categorias, contra 13 categorias e 284 produtos hoje. O maior vem primeiro (âncora) e o selo fica no do meio.</p>`;
-  list.innerHTML = categories.map(c => `
-    <div class="cat-block" id="cat-${c.id}"><header><h3>${c.name}</h3><p>${c.sub}</p></header>
-      <div class="items">${c.items.map((it, k) => card(it, k === 0 && ['pra-dois', 'galera'].includes(c.id))).join('')}</div></div>`).join('');
-  function card(it, anchor) {
-    const ph = it.img ? `style="background-image:url('${it.img}')"` : '';
-    const art = !it.img ? ` art ${it.emojiArt || ''}` : '';
-    return `<button class="card${anchor ? ' anchor' : ''}${it.badge ? ' hl' : ''}" data-id="${it.id}">
-      <div class="ph${art}" ${ph}>${it.badge ? `<span class="badge pill red">${it.badge}</span>` : ''}${it.serve > 1 ? `<span class="serve pill">Serve ${it.serve}</span>` : it.cat !== 'complete' ? '<span class="serve pill">Serve 1</span>' : ''}</div>
-      <div class="body"><h4>${it.name}</h4><p>${it.desc}</p><div class="meta"><span class="c">CMV ${fmt(it.cmv, 1)}%</span>${it.hoje && Math.abs(it.hoje - it.price) > .05 ? `<span class="h">hoje ${brl(it.hoje)}</span>` : ""}</div>
-      <div class="foot"><div><div class="price">${brl(it.price)}${it.de ? `<s>${brl(it.de)}</s>` : ''}</div>${it.de ? `<span class="save">economize ${brl(it.de - it.price)}</span>` : it.serve > 1 ? `<span class="save">${brl(it.price / it.serve)}/pessoa</span>` : ''}</div><span class="add">+</span></div></div></button>`;
+  /* ---------------- CARDÁPIO (dentro do celular) ---------------- */
+  const nav = $('#catNav'), list = $('#menuList'), scroller = $('#menuScroll');
+  const inPhone = () => matchMedia('(min-width: 761px)').matches; // no computador o cardápio rola dentro do celular
+  $('#mpCover').style.backgroundImage = "url('" + IMG.capa + "')"; $('#mpLogo').src = IMG.logo;
+  nav.innerHTML = categories.map((c, i) => '<button data-cat="' + c.id + '" class="' + (i ? '' : 'on') + '">' + c.name + '</button>').join('');
+  list.innerHTML = categories.map(c => '<div class="mp-cat" id="cat-' + c.id + '"><h3>' + c.name + '</h3><p>' + c.sub + '</p>' + c.items.map(row).join('') + '</div>').join('');
+  function row(it) {
+    const serve = it.cat === 'complete' ? '' : '<span>Serve ' + it.serve + '</span>';
+    return '<button class="mi" data-id="' + it.id + '"><div><h4>' + it.name + '</h4><p>' + it.desc + '</p>' +
+      '<div class="tags">' + (it.badge ? '<span class="b">' + it.badge + '</span>' : '') + serve + '<span class="c">CMV ' + fmt(it.cmv, 1) + '%</span></div>' +
+      '<div class="pr">' + brl(it.price) + (it.de ? '<s>' + brl(it.de) + '</s><small>economize ' + brl(it.de - it.price) + '</small>' : (it.serve > 1 ? '<small>' + brl(it.price / it.serve) + '/pessoa</small>' : '')) + '</div></div>' +
+      '<div class="ph' + (it.img ? '' : ' art ' + (it.emojiArt || '')) + '" style="' + (it.img ? "background-image:url('" + it.img + "')" : '') + '"><span class="add">+</span></div></button>';
   }
-  $$('.cat-nav button').forEach(b => b.addEventListener('click', () => { const t = $('#cat-' + b.dataset.cat); lenis ? lenis.scrollTo(t, { offset: -80, duration: 1.2 }) : t.scrollIntoView({ behavior: 'smooth' }); }));
-  const catIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) $$('.cat-nav button').forEach(b => b.classList.toggle('on', 'cat-' + b.dataset.cat === e.target.id)); }), { rootMargin: '-40% 0px -55% 0px' });
-  $$('.cat-block').forEach(b => catIO.observe(b));
-  list.addEventListener('click', e => { const c = e.target.closest('.card'); if (c) openSheet(byId(c.dataset.id)); });
+  const blocks = $$('.mp-cat', list);
+  function syncCat() {
+    const ref = inPhone() ? scroller.getBoundingClientRect().top + nav.offsetHeight + 12 : 64 + nav.offsetHeight + 16;
+    let cur = blocks[0];
+    for (const b of blocks) if (b.getBoundingClientRect().top <= ref) cur = b;
+    $$('button', nav).forEach(btn => { const on = 'cat-' + btn.dataset.cat === cur.id; if (on && !btn.classList.contains('on')) btn.scrollIntoView({ block: 'nearest', inline: 'center' }); btn.classList.toggle('on', on); });
+  }
+  scroller.addEventListener('scroll', syncCat, { passive: true }); addEventListener('scroll', syncCat, { passive: true });
+  $$('button', nav).forEach(btn => btn.addEventListener('click', () => {
+    const t = $('#cat-' + btn.dataset.cat);
+    if (inPhone()) scroller.scrollTo({ top: t.offsetTop - nav.offsetHeight - 4, behavior: 'smooth' });
+    else lenis ? lenis.scrollTo(t, { offset: -64 - nav.offsetHeight - 8, duration: 1 }) : t.scrollIntoView({ behavior: 'smooth' });
+  }));
+  list.addEventListener('click', e => { const c = e.target.closest('.mi'); if (c) openSheet(byId(c.dataset.id)); });
+  // QR code para abrir no celular
+  (() => { const url = 'https://cunha-hub.github.io/n1-cardapio-n1/site/#cardapio'; if (window.QRCode) new QRCode($('#qr'), { text: url, width: 208, height: 208, colorDark: '#1A0C05', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }); })();
 
   /* ---------------- modal com complementos ---------------- */
   const sheet = $('#sheet'), sheetBg = $('#sheetBg');
@@ -287,7 +297,7 @@
   function openSheet(it) {
     cur = it; sel = {};
     it.groups.forEach(g => { sel[g.id] = g.min === 1 && g.max === 1 && !g.multi ? [0] : (g.multi ? [] : []); });
-    renderSheet(); sheet.classList.add('on'); sheetBg.classList.add('on'); lenis && lenis.stop();
+    renderSheet(); sheet.classList.add('on'); sheetBg.classList.add('on'); if (!inPhone()) lenis && lenis.stop();
   }
   function closeSheet() { sheet.classList.remove('on'); sheetBg.classList.remove('on'); lenis && lenis.start(); }
   sheetBg.addEventListener('click', closeSheet);
@@ -338,7 +348,8 @@
     bagBtn.classList.toggle('on', bag.length > 0);
     const hasDrink = bag.some(b => b.extras.some(x => /Coca|Guaran|Fanta/.test(x)) || /coca|guarana|trio|4-em|super|combinho/.test(b.it.id));
     const hasSweet = bag.some(b => b.extras.some(x => /Brigadeiro|Churros/.test(x)) || /brigadeiro|churros|4-em/.test(b.it.id));
-    const up = !hasSweet ? byId('brigadeiro') : !hasDrink ? byId('coca') : null;
+    const doAssistente = bag.some(b => b.extras.includes('Montado pelo Assistente N1'));
+    const up = doAssistente ? null : !hasSweet ? byId('brigadeiro') : !hasDrink ? byId('coca') : null;
     const goal = 99, pct = Math.min(100, tot / goal * 100);
     bagEl.innerHTML = `<header><h3>Sacola</h3><button aria-label="Fechar" style="font-size:26px" id="bagX">×</button></header>
       <div class="prog">${tot >= goal ? '🎉 <b>Frete grátis liberado</b> (benefício do app)' : `Faltam <b>${brl(goal - tot)}</b> pro frete grátis <small>(no app)</small>`}<div class="t"><i style="width:${pct}%"></i></div></div>
@@ -350,17 +361,12 @@
     const ua = $('#upAdd'); if (ua) ua.onclick = () => { bag.push({ it: up, price: up.price, extras: [] }); updateBag(); };
     $('#payBtn').onclick = () => { $('#payBtn').textContent = 'Protótipo: aqui entra o checkout do iFood ou do app'; };
   }
-  const openBag = () => { updateBag(); bagEl.classList.add('on'); lenis && lenis.stop(); };
+  const openBag = () => { updateBag(); bagEl.classList.add('on'); if (!inPhone()) lenis && lenis.stop(); };
   function closeBag() { bagEl.classList.remove('on'); lenis && lenis.start(); }
   bagBtn.onclick = openBag;
 
   /* ---------------- ASSISTENTE N1 (IA) ---------------- */
-  const REC = {
-    1: { b: ['combinho', '4-em-n1', 'combo-p'], n: ['trio', '4-em-n1', 'combo-p'], c: ['4-em-n1', 'combo-p', 'combo-m'] },
-    2: { b: ['dupla', 'dupla-bites', 'combo-m'], n: ['dupla-bites', 'combo-m', 'super-combo'], c: ['combo-m', 'super-combo', 'combo-g'] },
-    3: { b: ['3-burgers', 'combo-m', 'combo-g'], n: ['combo-m', 'combo-g', 'combo-gg'], c: ['combo-m', 'combo-g', 'combo-gg'] },
-    5: { b: ['combo-g', 'combo-gg', 'combo-gg'], n: ['combo-g', 'combo-gg', 'combo-gg'], c: ['combo-g', 'combo-gg', 'combo-gg'] }
-  };
+  const AS = window.N1Assist;
   function makeChat(body, opts = {}) {
     const auto = !!opts.auto;
     const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -380,34 +386,36 @@
     }
     async function run(pick = [2, 2, 0]) {
       body.innerHTML = '';
-      await bot('E aí! Sou o <b>N1</b> 🍗 Me fala duas coisinhas que eu monto o pedido perfeito em 10 segundos.', 500);
+      await bot('E aí! Sou o <b>N1</b> \u{1f357} Me fala três coisinhas que eu monto o pedido perfeito em 10 segundos.', 500);
       await bot('Quantas pessoas vão comer?', 500);
-      const p = [1, 2, 3, 5][await ask(['Só eu', '2', '3 a 4', '5 ou mais'], pick[0])];
-      await bot('E o tamanho da fome? 😅');
-      const f = ['b', 'n', 'c'][await ask(['Beliscar', 'Fome normal', 'Fome de campeão'], pick[1])];
+      const pessoas = await ask(AS.GRUPO.map(g => g.label), pick[0]);
+      let grande = null;
+      if (AS.GRUPO[pessoas].grande) { await bot('Opa, galera! Mais ou menos quantas pessoas?', 450); grande = await ask(AS.GRANDE.map(g => g.label), pick[3] || 0); }
+      await bot('E o tamanho da fome? \u{1f605}');
+      const fome = await ask(AS.FOME.map(f => f.label), pick[1]);
       await bot('É pra quê?');
-      const oc = await ask(['Jogo 🏆', 'Série/filme', 'Almoço', 'Pular'], pick[2]);
-      const ids = (oc === 2 && p === 1) ? ['tradicional', 'parmegiana', 'combo-p'] : REC[p][f];
-      const [e, r, t] = ids.map(byId);
-      const same = ids[1] === ids[2];
-      await bot(`${p === 1 ? 'Pra você' : `Pra ${p === 5 ? '5 ou mais' : p === 3 ? '3 a 4' : 'dois'}`}${f === 'c' ? ' com fome de campeão' : ''}, quem pede comigo costuma levar isto:`, 700);
+      const ocasiao = await ask(AS.OCASIAO.map(o => o.label), pick[2]);
+      const pl = AS.plano({ pessoas, grande, fome, ocasiao, hora: new Date().getHours() }, allItems);
+      await bot(pl.intro, 700);
       const rec = document.createElement('div'); rec.className = 'rec msg';
-      const opt = (i, cls, lab) => `<div class="o ${cls}"><div class="ph" style="background-image:url('${i.img}')"></div><div><b>${i.name.split(' · ')[0]}</b><small>${lab} · serve ${i.serve}${i.serve > 1 ? ` · ${brl(i.price / i.serve)}/pessoa` : ''}</small></div><span class="pz">${brl(i.price)}</span></div>`;
-      rec.innerHTML = (same ? '' : opt(t, '', 'Completão')) + opt(r, 'best', 'O que eu levaria') + opt(e, '', 'Econômico');
+      rec.innerHTML = pl.opcoes.map(x => '<div class="o ' + (x.o === pl.rec ? 'best' : '') + '"><div class="ph" style="background-image:url(\'' + x.o.img + '\')"></div><div><b>' + x.o.nome + '</b><small>' + x.papel + ' · ' + 'alimenta ~' + pl.alimenta(x.o) + ' - ' + brl(pl.porPessoa(x.o)) + '/pessoa</small></div><span class="pz">' + brl(x.o.price) + '</span></div>').join('');
       body.appendChild(rec); scroll();
-      const c = await ask(['Quero o recomendado', 'Ver outro'], 0);
-      const chosen = c === 0 ? r : e;
-      const nDrinks = Math.min(p, 4), extra = oc === 0 ? 'Dia de jogo pede Coca gelada. Incluo ' + nDrinks + (nDrinks > 1 ? ' latas' : ' lata') + ' por <b>+ ' + brl(nDrinks * 11.9) + '</b>?' : 'Um brigadeiro de colher pra fechar? Dentro do combo sai <b>+ R$ 7,90</b>.';
-      await bot(extra);
+      const alt = pl.econ || pl.top;
+      const c = await ask(alt ? ['Quero o recomendado', pl.econ ? 'Quero o mais em conta' : 'Quero o completão'] : ['Quero esse'], 0);
+      const chosen = c === 0 ? pl.rec : alt;
+      const ex = pl.extra(chosen);
+      await bot(ex.texto);
       const up = await ask(['Bora!', 'Não, valeu'], 0);
-      const extraName = oc === 0 ? nDrinks + '× Coca-Cola lata' : 'Brigadeiro N1 de colher';
-      const price = chosen.price + (up === 0 ? (oc === 0 ? nDrinks * 11.9 : 7.9) : 0);
-      if (!auto && opts.onAdd) opts.onAdd(chosen, price, ['Montado pelo Assistente N1'].concat(up === 0 ? [extraName] : []));
-      await bot(`Fechado! <b>${chosen.name.split(' · ')[0]}</b>${up === 0 ? ' + ' + extraName : ''} = <b>${brl(price)}</b>. ${auto ? 'Chega em 35–45 min. Te aviso: empanando → fritando → saiu 🛵' : 'Já coloquei na sua sacola 😉'}`, 800);
-      if (auto) { await wait(3200); return run([[3, 1, 0], [1, 2, 1], [2, 2, 0]][Math.floor(Math.random() * 3)]); }
+      const final = up === 0 && ex.tipo === 'troca' ? ex.troca : chosen;
+      const somaExtra = up === 0 && ex.tipo !== 'troca' ? ex.total : 0;
+      const total = Math.round((final.price + somaExtra) * 100) / 100;
+      if (!auto && opts.onAdd) final.ids.forEach((id, k) => { const it = byId(id); opts.onAdd(it, it.price + (k === 0 ? somaExtra : 0), ['Montado pelo Assistente N1'].concat(k === 0 && somaExtra ? [ex.nome] : [])); });
+      await bot('Fechado! <b>' + final.nome + '</b>' + (somaExtra ? ' + ' + ex.nome : '') + ' = <b>' + brl(total) + '</b>. ' + (auto ? 'Chega em 35–45 min. Te aviso: empanando → fritando → saiu \u{1f6f5}' : 'Já coloquei na sua sacola \u{1f609}'), 800);
+      if (auto) { await wait(3200); return run([[3, 2, 0], [0, 1, 1], [1, 0, 1], [4, 1, 0, 1]][Math.floor(Math.random() * 4)]); }
       const again = document.createElement('div'); again.className = 'qr';
       again.innerHTML = '<button>Montar outro</button><button>Ver sacola</button>';
-      again.children[0].onclick = () => run(); again.children[1].onclick = () => { closeAI(); openBag(); };
+      again.children[0].onclick = () => run();
+      again.children[1].onclick = () => { closeAI(); const t = $('#cardapio'); if (inPhone()) { lenis ? lenis.scrollTo(t, { duration: 1 }) : t.scrollIntoView(); setTimeout(openBag, 700); } else openBag(); };
       body.appendChild(again); scroll();
     }
     return { run };
@@ -423,7 +431,7 @@
   // demo automática dentro do celular
   const pc = makeChat($('#phoneChatBody'), { auto: true });
   $('#apCard1').style.backgroundImage = `url('${IMG.comboM}')`; $('#apCard2').style.backgroundImage = `url('${IMG.comboG}')`;
-  ScrollTrigger.create({ trigger: '.phone', start: 'top 70%', once: true, onEnter: () => setTimeout(() => { $('#phoneChat').classList.add('on'); pc.run([3, 1, 0]); }, 900) });
+  ScrollTrigger.create({ trigger: '.phone', start: 'top 70%', once: true, onEnter: () => setTimeout(() => { $('#phoneChat').classList.add('on'); pc.run([3, 2, 0]); }, 900) });
   $('#phoneFab').onclick = () => $('#phoneChat').classList.toggle('on');
   (() => { let s = 1 * 3600 + 42 * 60 + 10; setInterval(() => { s = s > 0 ? s - 1 : 7200; const h = String(Math.floor(s / 3600)).padStart(2, '0'), m = String(Math.floor(s % 3600 / 60)).padStart(2, '0'), x = String(s % 60).padStart(2, '0'); $('#gameClock').textContent = `${h}:${m}:${x}`; }, 1000); })();
 

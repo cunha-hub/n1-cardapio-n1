@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="css/site.css">
 <link rel="stylesheet" href="css/site-v2.css">
 <link rel="stylesheet" href="css/flip.css">
+<link rel="stylesheet" href="css/menu-phone.css">
 <link rel="icon" href="https://static.ifood-static.com.br/image/upload/t_thumbnail/logosgde/8adf268a-29f7-4b0f-9952-db64720acd56/202607281749_IHL5.jpeg">
 </head>
 <body>
@@ -158,19 +159,37 @@
   </div>
 </section>
 
-<!-- ============ 7. CARDÁPIO NAVEGÁVEL ============ -->
+<!-- ============ 7. CARDÁPIO NO CELULAR ============ -->
 <section class="menu" id="cardapio">
-  <div class="wrap">
-    <div class="menu-head">
-      <div>
-        <span class="eyebrow" style="color:var(--r)" data-rv>Cardápio mestre N1 · todas as lojas · CMV ≤ 28%</span>
-        <h2 class="h-l" data-rv style="margin-top:14px">O novo cardápio.</h2>
-      </div>
-      <p class="lead" data-rv style="max-width:44ch">Toque em um item para ver os complementos como ficarão no iFood. Ou deixe o <b>Assistente N1</b>, a bolinha amarela, montar o pedido.</p>
+  <div class="wrap mp-grid">
+    <div class="mp-copy">
+      <span class="eyebrow" style="color:var(--r)" data-rv>Cardápio mestre N1 · todas as lojas · CMV ≤ 28%</span>
+      <h2 class="h-l" data-rv style="margin-top:14px">O novo cardápio,<br>na palma da mão.</h2>
+      <p class="lead" data-rv style="margin-top:16px">É assim que o cliente vê no iFood. Toque em um item para abrir os complementos e montar o pedido.</p>
+      <ul class="mp-points">
+        <li data-rv><b>7 categorias por ocasião</b><span>Só pra mim, pra dois, pra galera…</span></li>
+        <li data-rv><b>O maior primeiro, o selo no meio</b><span>A âncora vende o recomendado.</span></li>
+        <li data-rv><b>Complementos que vendem</b><span>Troca premium, bebida e doce no combo.</span></li>
+        <li data-rv><b>Todo item com CMV ≤ 28%</b><span>Preço calculado pela planilha de CMV 2026.</span></li>
+      </ul>
+      <div class="qr-box" data-rv><div id="qr" aria-hidden="true"></div><div><b>Abra no seu celular</b><small>Aponte a câmera ou acesse<br><span id="qrUrl">cunha-hub.github.io/n1-cardapio-n1</span></small></div></div>
     </div>
-    <div class="menu-shell">
-      <aside class="cat-nav" id="catNav"></aside>
-      <div id="menuList"></div>
+    <div class="mp-phone">
+      <div class="mp-notch" aria-hidden="true"></div>
+      <div class="mp-screen" id="mpScreen">
+        <div class="mp-status" aria-hidden="true"><b>9:41</b><span>▂▄▆ 5G ▮</span></div>
+        <div class="mp-scroll" id="menuScroll" data-lenis-prevent>
+          <div class="mp-cover" id="mpCover"></div>
+          <div class="mp-store"><img id="mpLogo" alt=""><div><b>N1 Chicken · Frango Frito Crocante</b><small>★ 4,8 · 35–45 min · Pedido mínimo R$ 29,90</small></div></div>
+          <nav class="mp-cats" id="catNav" aria-label="Categorias do cardápio"></nav>
+          <div id="menuList"></div>
+          <p class="mp-foot">Cardápio mestre N1 · igual nas 72 lojas</p>
+        </div>
+        <button class="bag-btn" id="bagBtn"><span class="c" id="bagCount">0</span><span id="bagTotal">R$ 0,00</span><span>Sacola</span></button>
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"></div>
+<aside class="bag" id="bag" aria-label="Sacola"></aside>
+      </div>
     </div>
   </div>
 </section>
@@ -247,10 +266,6 @@
 </footer>
 
 <!-- sacola / modal / assistente / lightbox -->
-<button class="bag-btn" id="bagBtn"><span class="c" id="bagCount">0</span><span id="bagTotal">R$ 0,00</span><span>Sacola</span></button>
-<div class="sheet-bg" id="sheetBg"></div>
-<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"></div>
-<aside class="bag" id="bag" aria-label="Sacola"></aside>
 <div class="lightbox" id="lightbox" role="dialog" aria-label="Print do iFood"><img alt=""><button aria-label="Fechar">×</button></div>
 
 <button class="ai-fab hint" id="aiFab" aria-label="Abrir Assistente N1"><img alt="" src="https://static.ifood-static.com.br/image/upload/t_thumbnail/logosgde/8adf268a-29f7-4b0f-9952-db64720acd56/202607281749_IHL5.jpeg"><span class="bub">Não sabe o que pedir? 🍗</span></button>
@@ -263,7 +278,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="js/menu-data.js"></script>
+<script src="js/assistente.js"></script>
 <script src="js/site.js"></script>
 </body>
 </html>

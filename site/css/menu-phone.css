@@ -1,0 +1,98 @@
+/* Cardápio dentro do celular.
+   Computador: moldura de celular com rolagem própria; sacola e complementos abrem dentro da tela.
+   Celular de verdade: sem moldura, o cardápio vira a própria tela. */
+.menu { padding: 110px 0 100px; background: var(--paper); }
+.mp-grid { display: grid; grid-template-columns: 1fr 400px; gap: 70px; align-items: center; }
+.mp-points { list-style: none; display: grid; gap: 12px; margin-top: 28px; }
+.mp-points li { display: grid; grid-template-columns: 36px 1fr; column-gap: 12px; align-items: start; }
+.mp-points li::before { content: ''; grid-row: span 2; width: 36px; height: 36px; border-radius: 50%; background: var(--y) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%231A0C05' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/18px no-repeat; }
+.mp-points b { font-size: 17px; }
+.mp-points span { color: var(--mute); font-size: 15px; }
+.qr-box { margin-top: 30px; display: inline-flex; gap: 16px; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 12px 18px 12px 12px; }
+.qr-box #qr { width: 104px; height: 104px; }
+.qr-box #qr img, .qr-box #qr canvas { width: 104px !important; height: 104px !important; }
+.qr-box b { display: block; font-size: 17px; }
+.qr-box small { color: var(--mute); font-size: 13px; line-height: 1.4; }
+
+/* moldura */
+.mp-phone { position: relative; width: 400px; height: min(820px, 88vh); min-height: 620px; border-radius: 56px; background: #120806; padding: 12px; box-shadow: 0 50px 100px rgba(142,0,0,.28), inset 0 0 0 2px #3c2a20; }
+.mp-notch { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); width: 112px; height: 30px; border-radius: 20px; background: #120806; z-index: 30; }
+.mp-screen { position: relative; height: 100%; border-radius: 44px; overflow: hidden; background: #fff; transform: translateZ(0); /* elementos fixed ficam presos à tela do celular */ }
+.mp-scroll { height: 100%; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 90px; }
+.mp-scroll::-webkit-scrollbar { display: none; }
+.mp-cover { height: 150px; background: #ddd center/cover; }
+.mp-store { display: flex; gap: 12px; align-items: center; padding: 0 16px 12px; border-bottom: 1px solid #eee; font-family: 'Fira Sans', sans-serif; }
+.mp-store img { width: 58px; height: 58px; border-radius: 50%; border: 3px solid #fff; margin-top: -26px; box-shadow: 0 4px 12px rgba(0,0,0,.15); position: relative; }
+.mp-store b { display: block; font-size: 15px; color: #3e3e3e; }
+.mp-store small { color: #717171; font-size: 12px; }
+.mp-cats { position: sticky; top: 0; z-index: 5; display: flex; gap: 6px; overflow-x: auto; padding: 10px 12px; background: rgba(255,255,255,.96); backdrop-filter: blur(8px); border-bottom: 1px solid #eee; scrollbar-width: none; }
+.mp-cats::-webkit-scrollbar { display: none; }
+.mp-cats button { flex: none; font-family: var(--round); font-weight: 800; font-size: 13px; padding: 8px 13px; border-radius: 99px; background: #f4f1e8; color: var(--ink); transition: background .2s, color .2s; }
+.mp-cats button.on { background: var(--ink); color: var(--y); }
+.mp-cat { padding: 16px 14px 4px; scroll-margin-top: 58px; }
+.mp-cat > h3 { font-size: 21px; font-weight: 900; font-style: italic; letter-spacing: -.02em; color: var(--ink); }
+.mp-cat > p { font-size: 12.5px; color: #8a8a8a; margin-top: 2px; }
+.mi { width: 100%; display: grid; grid-template-columns: 1fr 104px; gap: 12px; text-align: left; padding: 14px 0; border-bottom: 1px solid #f0f0f0; font-family: 'Fira Sans', sans-serif; color: #3e3e3e; }
+.mi:active { background: #fffbe6; }
+.mi h4 { font-size: 15px; font-weight: 600; line-height: 1.2; color: #3e3e3e; }
+.mi p { font-size: 12.5px; color: #8a8a8a; line-height: 1.3; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.mi .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+.mi .tags span { font-family: var(--round); font-weight: 700; font-size: 11px; padding: 2px 7px; border-radius: 6px; background: #f4f1e8; color: #5e5246; }
+.mi .tags .b { background: var(--r); color: #fff; }
+.mi .tags .c { background: #e3f6ea; color: #137a3c; }
+.mi .pr { margin-top: 7px; font-size: 15px; font-weight: 600; color: #50a773; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.mi .pr s { color: #aaa; font-weight: 400; font-size: 12.5px; }
+.mi .pr small { font-size: 11.5px; color: #137a3c; font-weight: 700; }
+.mi .ph { position: relative; width: 104px; height: 92px; border-radius: 10px; background: #f3f3f3 center/cover; align-self: center; }
+.mi .ph.art { background-size: auto; }
+.mi .ph .add { position: absolute; right: -4px; bottom: -6px; width: 30px; height: 30px; border-radius: 50%; background: var(--r); color: #fff; display: grid; place-items: center; font-size: 19px; font-weight: 700; box-shadow: 0 4px 10px rgba(0,0,0,.2); }
+.mp-foot { text-align: center; color: #aaa; font-size: 12px; padding: 20px 0 10px; }
+
+/* barra de status do celular (só no computador) */
+.mp-status { position: absolute; top: 0; left: 0; right: 0; height: 48px; z-index: 20; background: #fff; display: flex; justify-content: space-between; align-items: center; padding: 6px 30px 0 34px; font-family: var(--round); font-size: 14px; color: var(--ink); pointer-events: none; }
+.mp-status span { font-size: 11px; letter-spacing: .04em; font-weight: 800; }
+.mp-scroll { padding-top: 48px; }
+.mp-cats { top: 0; }
+
+/* sacola e complementos dentro da tela do celular */
+.mp-screen .sheet-bg { position: fixed; inset: 0; }
+.mp-screen .sheet { left: 0; right: 0; top: auto; bottom: 0; width: 100%; max-height: 90%; grid-template-columns: 1fr; border-radius: 26px 26px 0 0; transform: translateY(105%); }
+.mp-screen .sheet.on { transform: none; }
+.mp-screen .sheet .ph { min-height: 150px; }
+.mp-screen .sheet .side { max-height: calc(90vh - 150px); }
+.mp-screen .sheet h3 { font-size: 22px; }
+.mp-screen .sheet .x { top: 10px; right: 10px; }
+.mp-screen .bag { width: 100%; }
+.mp-screen .bag-btn { left: 12px; right: 12px; bottom: 14px; justify-content: space-between; border-radius: 16px; background: var(--r); padding: 14px 16px; }
+.mp-screen .bag-btn .c { background: #fff; color: var(--r); }
+
+@media (min-width: 761px) {
+  .mp-screen .sheet .side { max-height: calc(min(820px, 88vh) * .9 - 174px); }
+}
+@media (max-width: 1000px) and (min-width: 761px) {
+  .mp-grid { grid-template-columns: 1fr 360px; gap: 36px; }
+  .mp-phone { width: 360px; }
+}
+/* celular de verdade: sem moldura, o cardápio é a própria tela */
+@media (max-width: 760px) {
+  .menu { padding: 70px 0 0; background: #fff; }
+  .mp-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; width: 100%; }
+  .mp-copy, .mp-phone, .mp-screen, .mp-scroll { min-width: 0; max-width: 100%; }
+  .mp-copy { padding: 0 16px; }
+  .mp-points { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mp-points li { grid-template-columns: 1fr; }
+  .mp-points li::before { grid-row: auto; width: 26px; height: 26px; background-size: 14px; margin-bottom: 4px; }
+  .mp-points b { font-size: 14px; }
+  .mp-points span { font-size: 12.5px; }
+  .qr-box { display: none; }
+  .mp-phone { width: 100%; height: auto; min-height: 0; border-radius: 0; padding: 0; background: none; box-shadow: none; }
+  .mp-notch, .mp-status { display: none; }
+  .mp-scroll { padding-top: 0; }
+  .mp-screen { height: auto; border-radius: 0; overflow: visible; transform: none; }
+  .mp-scroll { height: auto; overflow: visible; padding-bottom: 20px; }
+  .mp-cats { top: 64px; }
+  .mp-cat { scroll-margin-top: 130px; }
+  .mp-screen .sheet { position: fixed; max-height: 92vh; }
+  .mp-screen .sheet .side { max-height: calc(92vh - 150px); }
+  .mp-screen .bag-btn { position: fixed; left: 12px; right: 84px; bottom: 16px; }
+}
