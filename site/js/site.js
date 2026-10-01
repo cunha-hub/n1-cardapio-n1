@@ -398,7 +398,7 @@
       const pl = AS.plano({ pessoas, grande, fome, ocasiao, hora: new Date().getHours() }, allItems);
       await bot(pl.intro, 700);
       const rec = document.createElement('div'); rec.className = 'rec msg';
-      rec.innerHTML = pl.opcoes.map(x => '<div class="o ' + (x.o === pl.rec ? 'best' : '') + '"><div class="ph" style="background-image:url(\'' + x.o.img + '\')"></div><div><b>' + x.o.nome + '</b><small>' + x.papel + ' · ' + 'alimenta ~' + pl.alimenta(x.o) + ' - ' + brl(pl.porPessoa(x.o)) + '/pessoa</small></div><span class="pz">' + brl(x.o.price) + '</span></div>').join('');
+      rec.innerHTML = pl.opcoes.map(x => '<div class="o ' + (x.o === pl.rec ? 'best' : '') + '"><div class="ph" style="background-image:url(\'' + x.o.img + '\')"></div><div><b>' + x.o.nome + '</b><small>' + x.papel + ' · ' + 'alimenta ~' + pl.alimenta(x.o) + (pl.justo(x.o) ? ' (fica justo)' : '') + ' - ' + brl(pl.porPessoa(x.o)) + '/pessoa</small></div><span class="pz">' + brl(x.o.price) + '</span></div>').join('');
       body.appendChild(rec); scroll();
       // um botão para cada opção (recomendado primeiro)
       const escolhas = [pl.rec, pl.top, pl.econ].filter(Boolean);

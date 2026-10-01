@@ -327,3 +327,59 @@ O desempate por número de combos só vale quando o preço empata. Por isso, 10 
 **Correção:** penalizar cada combo adicional no `sort` com cerca de R$ 8 (embalagem e montagem); o preço exibido continua o real. Para 13+, um seletor 13–30. Não é bloqueante.
 
 **Resumo para a apresentação:** o ponto 1 é bloqueante, porque é visível em qualquer teste de almoço com 2 ou mais pessoas. O ponto 2 é bloqueante se houver teste ao vivo com 3 ou 4 pessoas (não aparece na demo automática). Os pontos 3 e 4 aparecem na demo automática e convém corrigir antes, mas não quebram a apresentação. O ponto 5 pode esperar.
+
+---
+
+# Rodada 4 (final: 194 conversas, após as correções da rodada 3)
+
+Fontes: o `pesquisa/testes_assistente.md` regerado (194 conversas) e o `site/js/assistente.js` atual.
+
+## Nota: **8/10**
+
+Placar: **154 OK · 27 Atenção · 13 Problema**.
+
+**Conferido e resolvido:**
+- O nome do almoço em grupo sai certo, "N× Prato feito N1 (cada um escolhe o seu)", sem nenhum multiplicador duplicado nas 194 conversas.
+- "Alimenta ~N" agora é contado na fome escolhida: Chicken Bites P "~2" para 2 beliscando.
+- 3 pessoas com fome de campeão: R$ 101,80 em vez de R$ 212,90.
+- Completão limitado a 1,6× o preço do recomendado; "Mais em conta" só com economia de 8% ou mais.
+- 10 pessoas levam G + GG (2 caixas) em vez de 4× M.
+- Seletor até ~30 pessoas.
+
+**Contas:** conferi automaticamente os 194 fechamentos (recomendado + extra, ou a troca pelo 4 em N1): **0 divergências**. Também confirmei as somas dos pares novos (ex.: Trinca + Bites P = R$ 101,80; Combo G + 5× GG = R$ 1.213,40) e o limite de latas por item (Trinca + Bites M aceita 7).
+
+## Veredito por bloco
+
+| Conversas | Veredito | Motivo |
+|---|---|---|
+| Todo o solo (1–12, 193), todos os almoços (48 conversas), beliscar de 2 a ~30, 3 com fome de campeão (33–36), 5 com fome de campeão em diante e 6 ou mais com fome normal, exceto as listadas abaixo | OK | Quantidade na medida, escada de preço clara, latas dentro do limite, textos limpos. |
+| 29, 30, 32 | **Problema** | 3 pessoas com fome normal: o recomendado é Dupla + Bites P (**2 burgers para 3 pessoas**, sem batata). O "Mais em conta" (Trinca) mostra o mesmo "~3" e sai mais barato. |
+| 41, 42, 44, 194 | **Problema** | 4 pessoas com fome normal: Trinca + Bites P (**3 burgers para 4**, sem acompanhamento). O Combo G ("queridinho do dia de jogo") não aparece nem como Completão. O #41 é o caso da **demo automática**. |
+| 45, 46, 48 | **Problema** | 4 com fome de campeão: Trinca + Bites M (3 burgers para 4 campeões, sem acompanhamento). |
+| 53, 54, 56 | **Problema** | 5 com fome normal: Trinca + Bites M (3 burgers para 5). |
+| 101, 102, 104 · 145, 146, 148 | Atenção | O "Mais em conta" mostra o mesmo "alimenta ~N" que o recomendado (~9 e ~9), ou exatamente o tamanho do grupo (~15 para 15), e custa R$ 37 a R$ 57 menos. O cliente não entende por que pagar mais. |
+| 141, 142, 144 · 153, 154, 156 · 161, 162, 164 · 165, 166, 168 · 169, 170, 172 · 181, 182, 184 · 185, 186, 188 | Atenção | O "Mais em conta" vira 5, 6 ou 7× Combo M (até 8 caixas): a penalidade de R$ 8 por caixa só vale para o recomendado. |
+
+## Pontos restantes (máx. 3)
+
+**1. Burgers + bites viram refeição de grupo com fome normal e de campeão (13 conversas). BLOQUEANTE para a demo automática; nos outros casos, não bloqueante.**
+
+Os Chicken Bites são o item mais barato por capacidade (R$ 20,60 por pessoa servida no P, contra R$ 37 no Combo G). Por isso, "Dupla/Trinca + Bites" ganha de todo combo de frango de 3 a 5 pessoas. O resultado é menos burger do que gente, nenhuma batata, e o Combo G some da faixa de 3 a 5. O primeiro caso que a plateia vê ("4 · Fome normal · Jogo") recomenda 3 burgers para 4 pessoas.
+
+**Correção** (uma linha em `candidatos`): com fome normal ou de campeão, só combinar Bites com combos de frango (`G.filter(id => CAP[id].multi)`) e deixar Dupla/Trinca + Bites só para o beliscar. Opcionalmente, contar Bites a cerca de 70% da capacidade quando a fome não for beliscar.
+
+Com isso, 4 com fome normal voltam ao Combo G (R$ 148,90, ~4) e 3 com fome normal ficam com Combo M + Bites P (R$ 118,80). Acrescentar ao teste, para fome ≥ normal: número de burgers + porções de frango ≥ número de pessoas.
+
+**2. O arredondamento de "alimenta" (+0,4) desmente a regra do recomendado. Não bloqueante.**
+
+`floor(cap / f + 0.4)` transforma 8,6 em "~9" e 2,7 em "~3". Assim, um "Mais em conta" que não cobre a necessidade aparece com o mesmo número do recomendado, ou até com o tamanho do grupo (#29, #101, #145).
+
+**Correção:** se a opção não cobre a necessidade (`o.cap < basta`), exibir no máximo n − 1 e o texto "dá pra ~N (fica justo)". Se cobre, exibir `max(n, floor(cap / f))`. Teste: `alimenta(econ) < n` sempre que `econ.cap < need`.
+
+**3. "Mais em conta" com muitas caixas em grupos de 12+. Não bloqueante.**
+
+O "Mais em conta" é ordenado só por capacidade e ignora a penalidade por caixa: aparecem "7× Combo M" para ~25 e "6× Combo M" para 12 com fome de campeão. Isso significa mais embalagem e mais montagem para a cozinha.
+
+**Correção:** ordenar o `econ` por `custo(o)` (a mesma penalidade de R$ 8 por caixa) e não mostrar uma opção com mais caixas do que o recomendado + 1.
+
+**Resumo para a apresentação:** nada quebra na tela e as contas fecham. O único ponto bloqueante é o 1, e só porque é o caso exibido pela demo automática. A saída mais simples é aplicar a correção de uma linha; a alternativa imediata é apontar a demo para um caso já limpo, como "8 · Fome normal · Jogo" (#89, Combo GG + Bites M) ou "2 · Fome normal · Jogo" (#17). Os pontos 2 e 3 podem ficar para depois.

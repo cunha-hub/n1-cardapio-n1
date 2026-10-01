@@ -28,6 +28,11 @@ for (const c of casos) {
   chk(p.rec.cap >= p.need * (p.n <= 6 ? 0.97 : 1), `recomendado (${p.rec.nome}) alimenta ~${p.rec.cap}, precisa ${p.need}`);
   chk(p.alimenta(p.rec) >= p.n, `recomendado mostra "alimenta ~${p.alimenta(p.rec)}" para ${p.n} pessoas`);
   chk(p.opcoes.every(x => !/(\d+×\s*){2}/.test(x.o.nome)), 'multiplicador duplicado no nome');
+  // rodada 4: burger + Bites não é refeição de grupo fora do beliscar; "alimenta" coerente com a necessidade; caixas no mais em conta
+  if (c.fome > 0 && p.n >= 3) chk(!p.rec.ids.every(id => ['dupla', '3-burgers', 'bites-p', 'bites-m'].includes(id)), 'burgers + Bites como refeição de grupo');
+  p.opcoes.forEach(x => chk(p.justo(x.o) ? p.alimenta(x.o) <= p.n - 1 || p.n === 1 : p.alimenta(x.o) >= p.n, `"alimenta ~${p.alimenta(x.o)}" incoerente (${x.papel})`));
+  chk(!p.justo(p.rec), 'recomendado marcado como "fica justo"');
+  if (p.econ) chk(p.econ.ids.length <= p.rec.ids.length + 1, '"mais em conta" com caixas demais');
   if (p.econ) chk(p.econ.price <= p.rec.price * 0.92, '"mais em conta" economiza menos de 8%');
   if (p.top) chk(p.top.price <= p.rec.price * 1.6, 'completão custa mais de 1,6× o recomendado');
   if (p.n === 3 || p.n === 4) chk(p.porPessoa(p.rec) <= 45, 'buraco de preço para 3–4 pessoas: ' + brl(p.porPessoa(p.rec)) + '/pessoa');
@@ -64,7 +69,7 @@ for (const c of casos) {
   const ex = p.extra(p.rec), final = ex.tipo === 'troca' ? ex.troca.price : Math.round((p.rec.price + ex.total) * 100) / 100;
   linhas.push(`### ${n}. ${gl} · ${A.FOME[c.fome].label} · ${A.OCASIAO[c.ocasiao].label}${c.ocasiao === 2 ? ' (' + c.hora + 'h)' : ''}`,
     `- Necessidade: ${p.need} porções para ${p.n} pessoa(s)`, `- N1: "${p.intro}"`,
-    ...p.opcoes.map(x => `  - ${x.papel === 'O que eu levaria' ? '**' : ''}${x.papel}: ${x.o.nome} — ${brl(x.o.price)} (alimenta ~${p.alimenta(x.o)} · ${brl(p.porPessoa(x.o))}/pessoa)${x.papel === 'O que eu levaria' ? '**' : ''}`),
+    ...p.opcoes.map(x => `  - ${x.papel === 'O que eu levaria' ? '**' : ''}${x.papel}: ${x.o.nome} — ${brl(x.o.price)} (alimenta ~${p.alimenta(x.o)}${p.justo(x.o) ? " (fica justo)" : ""} · ${brl(p.porPessoa(x.o))}/pessoa)${x.papel === 'O que eu levaria' ? '**' : ''}`),
     `- N1 (extra): "${ex.texto.replace(/<\/?b>/g, '')}"`,
     `- Fechamento: ${ex.tipo === 'troca' ? ex.troca.nome : p.rec.nome + ' + ' + ex.nome} = **${brl(final)}**`, '');
 }

@@ -63,7 +63,8 @@
       G.forEach(id => L.push([id]));
       if (fome === 0) k.filter(id => CAP[id].petisco).forEach(id => L.push([id]));
       // degraus intermediários (ex.: 3–4 pessoas): um combo + Chicken Bites pra completar
-      G.filter(id => id !== 'dupla-bites').forEach(id => ['bites-p', 'bites-m'].forEach(b => L.push([id, b])));
+      // Bites completam combos de frango; burger + Bites só vale para beliscar
+      G.filter(id => id !== 'dupla-bites' && (fome === 0 || CAP[id].multi)).forEach(id => ['bites-p', 'bites-m'].forEach(b => L.push([id, b])));
       if (need > 4) { // grupos grandes: combinações de combos de frango (até 8)
         const M = k.filter(id => CAP[id].multi);
         const gera = (pre, from, left) => { if (pre.length >= 2) L.push(pre.slice()); if (!left) return; for (let i = from; i < M.length; i++) { pre.push(M[i]); gera(pre, i, left - 1); pre.pop(); } };
@@ -85,13 +86,18 @@
     const ops = candidatos(menu, n, resp.fome, oc.id, need).sort((a, b) => custo(a) - custo(b) || b.cap - a.cap);
     const basta = need * (n <= 6 ? 0.97 : 1); // 97% da necessidade já resolve em grupos pequenos
     const rec = ops.find(o => o.cap >= basta) || ops[ops.length - 1];
-    const econ = ops.filter(o => o.price <= rec.price * 0.92 && o.cap >= need * 0.8).sort((a, b) => b.cap - a.cap || a.price - b.price)[0] || null;
-    // "alimenta" contado na fome escolhida: Chicken Bites P dá pra ~2 beliscando
+    const econ = ops.filter(o => o.price <= rec.price * 0.92 && o.cap >= need * 0.8 && o.ids.length <= rec.ids.length + 1)
+      .sort((a, b) => b.cap - a.cap || custo(a) - custo(b))[0] || null;
+    // "alimenta" contado na fome escolhida (Chicken Bites P dá pra ~2 beliscando),
+    // coerente com a necessidade: quem cobre mostra pelo menos n; quem não cobre mostra no máximo n − 1 ("fica justo")
+    const cobre = o => o.cap >= basta - 1e-9;
     const inteiro = c => Math.max(1, Math.floor(c / fo.f + 0.4));
+    const pessoasOpcao = o => cobre(o) ? Math.max(n, inteiro(o.cap)) : Math.max(1, Math.min(n - 1, inteiro(o.cap)));
     const vale = o => inteiro(o.cap) > inteiro(rec.cap) || o.bebidas > rec.bebidas || o.doces > rec.doces;
     const top = ops.find(o => o.price >= rec.price * 1.12 && o.price <= rec.price * 1.6 && o.cap >= need && o.cap >= rec.cap && o.cap <= need * 1.6 && o.ids.length <= rec.ids.length + 1 && vale(o)) || null;
     const porPessoa = o => r2(o.price / n);             // mesmo divisor para todas as opções
-    const alimenta = o => inteiro(o.cap); // pessoas inteiras, na fome escolhida
+    const alimenta = o => pessoasOpcao(o); // pessoas inteiras, na fome escolhida
+    const justo = o => !cobre(o);
 
     function extra(o) { // uma única sugestão, coerente com a ocasião e com o que já vem incluso
       const querBebida = oc.id === 'jogo' || oc.id === 'almoco' || oc.id === 'pular';
@@ -125,7 +131,7 @@
     const nOp = [top, rec, econ].filter(Boolean).length;
     const aberturas = [', fiz as contas e eu iria nisso:', ', eu iria nesse aqui:', nOp === 3 ? ', separei três caminhos:' : nOp === 2 ? ', separei dois caminhos:' : ', esse aqui resolve:'];
     const intro = nota + g.txt + fo.txt + oc.txt + aberturas[(resp.pessoas + resp.fome + resp.ocasiao) % 3];
-    return { n, need, intro, rec, econ, top, porPessoa, alimenta, extra, ocasiao: oc.id,
+    return { n, need, intro, rec, econ, top, porPessoa, alimenta, justo, extra, ocasiao: oc.id,
       opcoes: [top && { o: top, papel: 'Completão' }, { o: rec, papel: 'O que eu levaria' }, econ && { o: econ, papel: 'Mais em conta' }].filter(Boolean) };
   }
 
