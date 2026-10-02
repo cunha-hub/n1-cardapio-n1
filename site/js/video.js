@@ -770,6 +770,23 @@
   }
   window.__render = render;
 
+  /* tela cheia fora de 16:9: o que sobraria preto vira a extensão das bordas do próprio quadro, desfocada.
+     Os fundos das cenas são quase lisos, então a emenda some. Só roda no player (não entra na exportação). */
+  const amb = document.getElementById('amb'), actx = amb ? amb.getContext('2d') : null; let exporting = false;
+  function ambient() {
+    if (!actx || exporting) return;
+    const sw = innerWidth, sh = innerHeight;
+    if (Math.abs(sw / sh - W / H) < .012) { if (amb.style.display !== 'none') amb.style.display = 'none'; return; }
+    amb.style.display = 'block';
+    const aw = 320, ah = Math.max(2, Math.round(aw * sh / sw)); if (amb.width !== aw || amb.height !== ah) { amb.width = aw; amb.height = ah; }
+    const k = Math.min(sw / W, sh / H), fw = W * k * aw / sw, fh = H * k * aw / sw, fx = (aw - fw) / 2, fy = (ah - fh) / 2;
+    actx.drawImage(cv, 0, 0, W, H, fx, fy, fw, fh); // o meio também é preenchido, para o desfoque não escurecer a emenda
+    if (fy > .5) { actx.drawImage(cv, 0, 0, W, 4, 0, 0, aw, fy + 1); actx.drawImage(cv, 0, H - 14, W, 4, 0, fy + fh - 1, aw, ah - fy - fh + 1); }
+    if (fx > .5) { actx.drawImage(cv, 0, 0, 4, H, 0, 0, fx + 1, ah); actx.drawImage(cv, W - 4, 0, 4, H, fx + fw - 1, 0, aw - fx - fw + 1, ah); }
+  }
+  const renderBase = render;
+  window.__render = t => { renderBase(t); ambient(); };
+
   /* =================== MUSICA (Suno) + EFEITOS (js/sfx-lancamento.js) =================== */
   const MUSIC = 'assets/music/trilha-suno.mp3';
   const music = (() => {
@@ -812,6 +829,9 @@
   })();
   window.__music = music;
   /* =================== player =================== */
+  const paint = t => { render(t); ambient(); };
+  addEventListener('resize', () => paint(tNow));
+  document.addEventListener('fullscreenchange', () => setTimeout(() => paint(tNow), 60));
   const $ = sel => document.querySelector(sel);
   let playing = false, tNow = 0, raf = 0, recorder = null, chunks = [];
   const seek = $('#seek'), tc = $('#tc');
@@ -820,8 +840,8 @@
   function loop() {
     if (!playing) return;
     tNow = music.now(); music.vol(tNow);
-    if (tNow >= END) { tNow = END; render(END - .001); stop(); if (recorder) finishRec(); ui(); return; }
-    if (tNow >= 0) render(tNow);
+    if (tNow >= END) { tNow = END; paint(END - .001); stop(); if (recorder) finishRec(); ui(); return; }
+    if (tNow >= 0) paint(tNow);
     ui(); raf = requestAnimationFrame(loop);
   }
   if (/[?&]embed=1/.test(location.search)) document.body.classList.add('embed');
@@ -830,7 +850,7 @@
   $('#start').onclick = () => play(0);
   $('#play').onclick = () => playing ? stop() : play();
   $('#restart').onclick = () => { stop(); tNow = 0; play(0); };
-  seek.oninput = () => { const was = playing; if (was) stop(); tNow = +seek.value; render(tNow); ui(); seek._resume = was; };
+  seek.oninput = () => { const was = playing; if (was) stop(); tNow = +seek.value; paint(tNow); ui(); seek._resume = was; };
   seek.onchange = () => { if (seek._resume) play(+seek.value); };
   $('#fs').onclick = () => { const el = document.documentElement; document.fullscreenElement ? document.exitFullscreen() : el.requestFullscreen && el.requestFullscreen(); };
   addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); playing ? stop() : play(); } });
@@ -838,6 +858,10 @@
   const yieldMC = () => new Promise(r => { const ch = new MessageChannel(); ch.port1.onmessage = () => r(); ch.port2.postMessage(0); });
   const loadScript = src => new Promise((r, j) => { const sc = document.createElement('script'); sc.src = src; sc.onload = r; sc.onerror = j; document.head.appendChild(sc); });
   async function exportMP4(opts = {}) {
+    exporting = true;
+    try { return await exportMP4Inner(opts); } finally { exporting = false; }
+  }
+  async function exportMP4Inner(opts = {}) {
     const buf = await music.ready; await fontsReady;
     if (!window.Mp4Muxer) await loadScript('https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.min.js');
     const fps = 30, N = Math.round(END * fps), sr = buf.sampleRate, { Muxer, ArrayBufferTarget } = window.Mp4Muxer;
