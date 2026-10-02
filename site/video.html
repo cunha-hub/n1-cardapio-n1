@@ -15,18 +15,18 @@
   /* tela cheia fora de 16:9: as faixas viram extensão das bordas do próprio quadro (desfocada), em vez de preto */
   #amb { position: fixed; inset: -2%; width: 104vw; height: 104vh; filter: blur(10px) saturate(1.08); z-index: 0; display: none; }
   canvas { width: min(100vw, 177.78vh); height: min(56.25vw, 100vh); display: block; background: #000; }
-  .ui { position: fixed; left: 0; right: 0; bottom: 0; padding: 14px 16px 16px; display: flex; gap: 10px; align-items: center; background: linear-gradient(transparent, rgba(0,0,0,.7)); opacity: 0; transition: opacity .3s; }
+  .ui { z-index: 10; position: fixed; left: 0; right: 0; bottom: 0; padding: 14px 16px 16px; display: flex; gap: 10px; align-items: center; background: linear-gradient(transparent, rgba(0,0,0,.7)); opacity: 0; transition: opacity .3s; }
   body:hover .ui, body.paused .ui { opacity: 1; }
   .ui button { font: 700 14px 'Dosis', sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); background: var(--y); border: 0; border-radius: 99px; padding: 9px 14px; cursor: pointer; white-space: nowrap; }
   .ui button.alt { background: rgba(255,255,255,.14); color: #fff; }
   .ui input[type=range] { flex: 1; accent-color: var(--r); min-width: 60px; }
   .ui .tc { font: 700 13px 'Dosis', sans-serif; letter-spacing: .06em; min-width: 92px; text-align: right; font-variant-numeric: tabular-nums; }
-  .start { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(11,5,3,.35); cursor: pointer; }
+  .start { z-index: 10; position: fixed; inset: 0; display: grid; place-items: center; background: rgba(11,5,3,.35); cursor: pointer; }
   .start .b { width: 112px; height: 112px; border-radius: 50%; background: var(--y); display: grid; place-items: center; box-shadow: 0 20px 60px rgba(0,0,0,.5); transition: transform .3s; }
   .start:hover .b { transform: scale(1.08); }
   .start .b::after { content: ''; border-left: 36px solid var(--ink); border-top: 22px solid transparent; border-bottom: 22px solid transparent; margin-left: 10px; }
   .start small { position: absolute; bottom: 12%; font: 700 13px 'Dosis', sans-serif; letter-spacing: .3em; text-transform: uppercase; opacity: .9; text-shadow: 0 2px 10px #000; }
-  .rec { position: fixed; top: 14px; left: 14px; font: 800 13px 'Dosis', sans-serif; letter-spacing: .08em; background: var(--r); padding: 8px 12px; border-radius: 8px; display: none; }
+  .rec { z-index: 10; position: fixed; top: 14px; left: 14px; font: 800 13px 'Dosis', sans-serif; letter-spacing: .08em; background: var(--r); padding: 8px 12px; border-radius: 8px; display: none; }
   .rec.on { display: block; animation: blink 1s infinite; }
   @keyframes blink { 50% { opacity: .5; } }
   @media (max-width: 560px) { .ui { flex-wrap: wrap; } .ui input[type=range] { order: -1; flex-basis: 100%; } }
