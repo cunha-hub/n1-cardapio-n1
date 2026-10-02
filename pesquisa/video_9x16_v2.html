@@ -12,7 +12,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; background: #0b0503; color: #fff; font-family: 'Fira Sans', system-ui, sans-serif; overflow: hidden; }
   .stage { position: fixed; inset: 0; display: grid; place-items: center; }
-  canvas { width: min(100vw, 177.78vh); height: min(56.25vw, 100vh); display: block; background: #000; }
+  canvas { width: min(100vw, 56.25vh); height: min(177.78vw, 100vh); display: block; background: #000; }
   .ui { position: fixed; left: 0; right: 0; bottom: 0; padding: 14px 16px 16px; display: flex; gap: 10px; align-items: center; background: linear-gradient(transparent, rgba(0,0,0,.7)); opacity: 0; transition: opacity .3s; }
   body:hover .ui, body.paused .ui { opacity: 1; }
   .ui button { font: 700 14px 'Dosis', sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); background: var(--y); border: 0; border-radius: 99px; padding: 9px 14px; cursor: pointer; white-space: nowrap; }
@@ -38,20 +38,20 @@
 </style>
 </head>
 <body class="paused">
-<div class="stage"><canvas id="c" width="1920" height="1080" aria-label="Vídeo de apresentação N1 Chicken"></canvas></div>
-<div class="start" id="start"><div class="b"></div><small>Assistir com som · 1m20s</small></div>
+<div class="stage"><canvas id="c" width="1080" height="1920" aria-label="Vídeo de apresentação N1 Chicken"></canvas></div>
+<div class="start" id="start"><div class="b"></div><small>Assistir com som · 1m10s</small></div>
 <div class="rec" id="recTag">● GRAVANDO .WEBM · NÃO TROQUE DE ABA</div>
 <div class="ui">
   <button id="play">▶ Play</button>
   <button class="alt" id="restart">↺</button>
-  <input type="range" id="seek" min="0" max="80" step="0.01" value="0" aria-label="Linha do tempo">
-  <span class="tc" id="tc">00:00 / 01:20</span>
+  <input type="range" id="seek" min="0" max="70" step="0.01" value="0" aria-label="Linha do tempo">
+  <span class="tc" id="tc">00:00 / 01:10</span>
   <button class="alt" id="fs">⛶</button>
   <button id="export" title="Gera o vídeo com áudio quadro a quadro e baixa um .mp4">Exportar MP4</button>
 </div>
 <script src="js/menu-data.js"></script>
 <script src="js/motion-transitions.js"></script>
-<script src="js/sfx-lancamento.js"></script>
+<script src="js/trilha-lancamento.js"></script>
 <script src="js/video.js"></script>
 </body>
 </html>

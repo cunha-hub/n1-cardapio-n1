@@ -44,51 +44,7 @@
   function rr(c, x, y, w, h, r, keep) { r = Math.min(r, w / 2, h / 2); if (!keep) c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
   function cover(im, x, y, w, h, fx = .5, fy = .5) { if (!im || !im.complete || !im.naturalWidth) { g.fillStyle = Y2; g.fillRect(x, y, w, h); return; } const s = Math.max(w / im.naturalWidth, h / im.naturalHeight), iw = im.naturalWidth * s, ih = im.naturalHeight * s; g.drawImage(im, x + (w - iw) * fx, y + (h - ih) * fy, iw, ih); }
   function wrap(str, x, y, maxW, lh, o) { g.save(); g.font = F(o.w || 400, o.s || 24, o.it, o.f); const words = str.split(' '); let line = '', yy = y; for (const w of words) { const t = line ? line + ' ' + w : w; if (g.measureText(t).width > maxW && line) { T(line, x, yy, o); line = w; yy += lh; } else line = t; } if (line) T(line, x, yy, o); g.restore(); return yy; }
-  function pill(str, x, y, o = {}) { g.save(); g.font = F(800, o.s || 20, false, 'Dosis'); if ('letterSpacing' in g) g.letterSpacing = '1.5px'; const w = g.measureText(str.toUpperCase()).width + (o.px || 28); const h = (o.s || 20) * 1.8; const ax = o.a === 'right' ? x - w : o.a === 'center' ? x - w / 2 : x; g.globalAlpha *= o.al == null ? 1 : o.al; if ((o.s || 20) >= 18 && !o.flat) glassPill(ax, y - h / 2, w, h, o.bg || Y); else { rr(g, ax, y - h / 2, w, h, h / 2); g.fillStyle = o.bg || Y; g.fill(); } if (o.bd) { g.strokeStyle = o.bd; g.lineWidth = 2; g.stroke(); } g.fillStyle = o.c || INK; g.textBaseline = 'middle'; g.fillText(str.toUpperCase(), ax + (o.px || 28) / 2, y + 1); g.restore(); return w; }
-
-  /* ---------- liquid glass ---------- */
-  let GT = 0; // tempo atual, para o reflexo que desliza pelo vidro
-  const rgbOf = c => { let h = String(c).replace('#', ''); if (h.length === 3) h = h.split('').map(z => z + z).join(''); const n = parseInt(h, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
-  function txtW(str, w, s, it, f, ls = 0) { g.save(); g.font = F(w, s, it, f); if ('letterSpacing' in g) g.letterSpacing = ls + 'px'; const v = g.measureText(str).width; g.restore(); return v; }
-  function fitS(str, maxW, w, f, s) { const m = txtW(str, w, s, false, f); return m > maxW ? s * maxW / m : s; }
-  /* vidro: fundo desfocado e levemente ampliado (lente), tinta translucida, brilho no topo, reflexo que desliza e borda de luz */
-  function glass(x, y, w, h, r, o = {}) {
-    if (w < 4 || h < 4) return;
-    const tint = o.tint || '255,255,255', ta = o.ta ?? .2, dark = !!o.dark;
-    g.save();
-    g.shadowColor = o.sh || 'rgba(26,12,5,.30)'; g.shadowBlur = o.blur ?? 34; g.shadowOffsetY = o.oy ?? 14; rr(g, x, y, w, h, r); g.fillStyle = 'rgba(' + tint + ',' + Math.max(.05, ta * .5) + ')'; g.fill(); g.shadowColor = 'transparent';
-    g.save(); rr(g, x, y, w, h, r); g.clip();
-    const m = g.getTransform(), pts = [[x, y], [x + w, y], [x, y + h], [x + w, y + h]].map(([px, py]) => [m.a * px + m.c * py + m.e, m.b * px + m.d * py + m.f]);
-    const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), pad = 28;
-    const sx = Math.max(0, x0 - pad), sy = Math.max(0, y0 - pad), ex = Math.min(g.canvas.width, x1 + pad), ey = Math.min(g.canvas.height, y1 + pad);
-    if (ex - sx > 2 && ey - sy > 2) {
-      g.setTransform(1, 0, 0, 1, 0, 0);
-      const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, k = 1.06;
-      g.filter = 'blur(' + (o.bl ?? 16) + 'px) saturate(1.6) brightness(' + (dark ? .9 : 1.08) + ')';
-      g.drawImage(g.canvas, sx, sy, ex - sx, ey - sy, cx + (sx - cx) * k, cy + (sy - cy) * k, (ex - sx) * k, (ey - sy) * k);
-      g.filter = 'none';
-    }
-    g.restore();
-    rr(g, x, y, w, h, r); const gr = g.createLinearGradient(x, y, x, y + h); gr.addColorStop(0, 'rgba(' + tint + ',' + (ta + .12) + ')'); gr.addColorStop(1, 'rgba(' + tint + ',' + ta + ')'); g.fillStyle = gr; g.fill();
-    g.save(); rr(g, x, y, w, h, r); g.clip();
-    const gl = g.createLinearGradient(x, y, x, y + h * .55); gl.addColorStop(0, 'rgba(255,255,255,' + (dark ? .22 : .38) + ')'); gl.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gl; g.fillRect(x, y, w, h * .55);
-    const sh = g.createLinearGradient(x, y + h * .55, x, y + h); sh.addColorStop(0, 'rgba(0,0,0,0)'); sh.addColorStop(1, 'rgba(0,0,0,' + (dark ? .28 : .12) + ')'); g.fillStyle = sh; g.fillRect(x, y + h * .55, w, h * .45);
-    const ph = ((GT * .22 + (o.ph || 0)) % 1.8) - .4, bw = Math.max(40, w * .16);
-    g.save(); g.translate(x + ph * w, y + h / 2); g.rotate(-.35); const sg = g.createLinearGradient(-bw, 0, bw, 0); sg.addColorStop(0, 'rgba(255,255,255,0)'); sg.addColorStop(.5, 'rgba(255,255,255,' + (dark ? .16 : .28) + ')'); sg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = sg; g.fillRect(-bw, -h, bw * 2, h * 2); g.restore();
-    g.restore();
-    rr(g, x + 1, y + 1, w - 2, h - 2, Math.max(1, r - 1)); const rg = g.createLinearGradient(x, y, x + w, y + h);
-    rg.addColorStop(0, 'rgba(255,255,255,.95)'); rg.addColorStop(.3, 'rgba(255,255,255,.22)'); rg.addColorStop(.7, 'rgba(255,255,255,.14)'); rg.addColorStop(1, 'rgba(255,255,255,.7)');
-    g.lineWidth = o.lw || 2; g.strokeStyle = rg; g.stroke();
-    g.restore();
-  }
-  function glassPill(x, y, w, h, bgc) { const c = rgbOf(bgc), lum = (c[0] * .3 + c[1] * .59 + c[2] * .11) / 255, white = lum > .93; glass(x, y, w, h, h / 2, { tint: c.join(','), ta: lum < .35 ? .5 : white ? .36 : .52, dark: lum < .35, blur: 22, oy: 10, ph: (x * .001) % 1 }); }
-  /* manchas de cor que derivam atras do vidro, para ele ter o que refratar */
-  function orbs(lt, cols, a = .22) {
-    [[1560, 800, 560, 0], [260, 940, 480, 1.9], [1760, 160, 400, 3.3]].forEach(([ox, oy, r, ph], k) => {
-      const cx = ox + Math.sin(lt * .4 + ph) * 130, cy = oy + Math.cos(lt * .31 + ph * 1.3) * 80, gr = g.createRadialGradient(cx, cy, 0, cx, cy, r), c = cols[k % cols.length];
-      gr.addColorStop(0, 'rgba(' + c + ',' + a + ')'); gr.addColorStop(1, 'rgba(' + c + ',0)'); g.fillStyle = gr; g.fillRect(cx - r, cy - r, r * 2, r * 2);
-    });
-  }
+  function pill(str, x, y, o = {}) { g.save(); g.font = F(800, o.s || 20, false, 'Dosis'); if ('letterSpacing' in g) g.letterSpacing = '1.5px'; const w = g.measureText(str.toUpperCase()).width + (o.px || 28); const h = (o.s || 20) * 1.8; const ax = o.a === 'right' ? x - w : o.a === 'center' ? x - w / 2 : x; rr(g, ax, y - h / 2, w, h, h / 2); g.fillStyle = o.bg || Y; g.globalAlpha *= o.al == null ? 1 : o.al; g.fill(); if (o.bd) { g.strokeStyle = o.bd; g.lineWidth = 2; g.stroke(); } g.fillStyle = o.c || INK; g.textBaseline = 'middle'; g.fillText(str.toUpperCase(), ax + (o.px || 28) / 2, y + 1); g.restore(); return w; }
 
   /* ---------- imagens ---------- */
   const load = src => { const i = new Image(); i.crossOrigin = 'anonymous'; i.src = src; return i; };
@@ -180,7 +136,7 @@
 
   /* ---------- CENA 1 · números ---------- */
   function sNums(s, lt) {
-    bg(PAPER); orbs(lt, ['255,237,0', '255,0,0'], .2);
+    bg(PAPER);
     layer(s, .6, () => { g.fillStyle = Y; g.globalAlpha = .55; g.beginPath(); g.arc(1650, 180, 330, 0, 7); g.fill(); g.globalAlpha = 1; });
     layer(s, 1, () => {
       T('BI TASTEFY · SETEMBRO/2026 · TODAS AS LOJAS N1', 120, 150, { f: 'Dosis', w: 800, s: 22, ls: 5, c: R, al: seg(lt, .2, .6) });
@@ -192,16 +148,15 @@
       g.save(); g.translate(-out * 900, 0); g.globalAlpha = 1 - out;
       const cards = [[517910, 0, '', '', 'visitas/mês na loja'], [60850, 0, '', '', 'pedidos em setembro'], [3.59, 2, 'R$ ', ' mi', 'de GMV no mês'], [34, 0, '', '%', 'dos pedidos da rede']];
       cards.forEach((c, i) => {
-        const p = seg(lt, .9 + i * .18, 2.8 + i * .18), x = 120 + i * 430, fs = Math.min(...cards.map(k => fitS(k[2] + nf(k[0], k[1]) + k[3], 330, 800, 'Dosis', 104)));
-        g.save(); g.globalAlpha *= clamp(p * 4); glass(x - 30, 470, 414, 296, 40, { ta: .28, ph: i * .3 }); g.restore();
-        T(c[2] + nf(c[0] * eOutExpo(p), c[1]) + c[3], x, 650, { f: 'Dosis', w: 800, s: fs, al: clamp(p * 3) });
+        const p = seg(lt, .9 + i * .18, 2.8 + i * .18), x = 120 + i * 430;
+        g.fillStyle = INK; g.globalAlpha = (1 - out) * clamp(p * 4); g.fillRect(x, 520, 390, 4); g.globalAlpha = 1 - out;
+        T(c[2] + nf(c[0] * eOutExpo(p), c[1]) + c[3], x, 650, { f: 'Dosis', w: 800, s: 104, al: clamp(p * 3) });
         T(c[4], x, 705, { w: 600, s: 30, c: MUTE, al: clamp(p * 3) });
       });
       g.restore();
     });
     const bp = seg(lt, 5.0, 6.8);
     if (bp > 0) layer(s, 1.15, () => {
-      g.save(); g.globalAlpha *= clamp(bp * 3); glass(90, 500, 1740, 560, 44, { ta: .26 }); g.restore();
       T('CONVERSÃO NO iFOOD · SET/26', 120, 540, { f: 'Dosis', w: 800, s: 22, ls: 5, c: MUTE, al: clamp(bp * 3) });
       const bars = [['Marmita Top', 14.93, INK], ['Brasileirinho', 13.99, INK], ['N1 Chicken', 11.75, R]];
       bars.forEach((b, i) => {
@@ -217,7 +172,7 @@
   /* ---------- CENA 2 · funil ---------- */
   const FUN = [100, 50.9, 20.3, 19.4, 11.2], FUNK = ['Visitas', 'Clicam num item', 'Põem na sacola', 'Checkout', 'Pedem'];
   function sFunil(s, lt) {
-    bg(INK); orbs(lt, ['255,0,0', '255,150,0'], .2);
+    bg(INK);
     layer(s, 1, () => {
       rise('De cada 100 que entram,', 120, 190, seg(lt, .3, 1.1), { s: 88, c: '#fff' });
       rise('só 11 pedem.', 120, 290, seg(lt, .5, 1.3), { s: 88, c: Y });
@@ -257,7 +212,7 @@
       if (c1 > 0) { pill('49% não clicam em nada', x0 + cw * .95, 330, { bg: '#fff', s: 22, al: eOutCubic(c1) }); }
       if (c2 > 0) { const pulse = 1 + Math.sin(lt * 8) * .03; g.save(); g.translate(x0 + cw * 1.95, 330); g.scale(pulse, pulse); pill('60% abrem o item e desistem', 0, 0, { bg: R, c: '#fff', s: 22, al: eOutCubic(c2) }); g.restore(); }
     });
-    if (c3 > 0) rise('É aqui que o cardápio perde a venda.', 1800, 1015, c3, { s: 44, c: '#fff', a: 'right' });
+    if (c3 > 0) rise('É aqui que o cardápio perde a venda.', 1800, 1040, c3, { s: 44, c: '#fff', a: 'right' });
   }
 
   /* ---------- CENA 3 · como é hoje (tira de filme) ---------- */
@@ -272,7 +227,7 @@
   const SH_W = 1000, SH_H = SH_W * 744 / 1568, SH_G = 70, SH_SP = 440;
   const shotT = i => (300 + (SH_W + SH_G) * i) / SH_SP;
   function sHoje(s, lt) {
-    bg(PAPER); orbs(lt, ['255,237,0', '255,0,0'], .18);
+    bg(PAPER);
     layer(s, .7, () => { g.fillStyle = Y; g.fillRect(-600, 700, W + 1200, 380); });
     layer(s, 1, () => {
       T('iFOOD · N1 CHICKEN VITÓRIA-ES · PRINTS DE 30/09/2026', 120, 130, { f: 'Dosis', w: 800, s: 22, ls: 5, c: R, al: seg(lt, .1, .5) });
@@ -295,7 +250,7 @@
         }
         g.restore();
         const lp = seg(lt, shotT(i) - .4, shotT(i) + .4);
-        if (lp > 0) { g.save(); g.globalAlpha = eOutCubic(lp); glass(x - 8, y + SH_H + 34, 76 + txtW(sh[1], 800, 36) + 48, 84, 42, { ta: .34, ph: i * .2 }); g.beginPath(); g.arc(x + 30, y + SH_H + 76, 28, 0, 7); g.fillStyle = R; g.fill(); T(String(i + 1), x + 30, y + SH_H + 87, { f: 'Dosis', w: 800, s: 30, c: '#fff', a: 'center' }); T(sh[1], x + 76, y + SH_H + 88, { w: 800, s: 36 }); g.restore(); }
+        if (lp > 0) { g.save(); g.globalAlpha = eOutCubic(lp); g.beginPath(); g.arc(x + 30, y + SH_H + 76, 28, 0, 7); g.fillStyle = R; g.fill(); T(String(i + 1), x + 30, y + SH_H + 87, { f: 'Dosis', w: 800, s: 30, c: '#fff', a: 'center' }); T(sh[1], x + 76, y + SH_H + 88, { w: 800, s: 36 }); g.restore(); }
       });
     });
     const cp = seg(lt, 1.2, 2);
@@ -307,10 +262,9 @@
 
   /* ---------- CENA 4 · ticket ---------- */
   function sTicket(s, lt) {
-    bg(R); orbs(lt, ['255,237,0', '90,0,0'], .26);
+    bg(R);
     layer(s, .7, () => { g.fillStyle = R2; for (let k = 0; k < 9; k++) g.fillRect(-600, 140 + k * 110, W + 1200, 2); });
     layer(s, 1, () => {
-      g.save(); g.globalAlpha *= seg(lt, 1, 1.6); glass(890, 330, 900, 700, 44, { ta: .2 }); g.restore();
       T('CAMPANHA MAUÁ · JUL → SET/2026', 120, 150, { f: 'Dosis', w: 800, s: 22, ls: 5, c: Y, al: seg(lt, .1, .5) });
       rise('O volume subiu.', 120, 260, seg(lt, .25, 1), { s: 96, c: '#fff' });
       rise('O ticket caiu.', 120, 370, seg(lt, .7, 1.5), { s: 96, c: Y });
@@ -320,7 +274,7 @@
       const segs = 2 * eInOutCubic(dp); g.moveTo(X(0), Yv(pts[0][1]));
       for (let i = 1; i <= 2; i++) { const f = clamp(segs - (i - 1)); if (f <= 0) break; g.lineTo(lerp(X(i - 1), X(i), f), lerp(Yv(pts[i - 1][1]), Yv(pts[i][1]), f)); }
       g.stroke(); g.restore();
-      pts.forEach((p, i) => { const q = seg(lt, 1.4 + i * .85, 1.9 + i * .85); if (q <= 0) return; g.beginPath(); g.arc(X(i), Yv(p[1]), 16 * eOutBack(q), 0, 7); g.fillStyle = Y; g.fill(); T(brl(p[1]), X(i), Yv(p[1]) + (i ? 78 : -40), { f: 'Dosis', w: 800, s: 46, c: '#fff', a: 'center', al: q }); T(p[2].toUpperCase(), X(i), 990, { f: 'Dosis', w: 800, s: 24, ls: 4, c: Y, a: 'center', al: q }); });
+      pts.forEach((p, i) => { const q = seg(lt, 1.4 + i * .85, 1.9 + i * .85); if (q <= 0) return; g.beginPath(); g.arc(X(i), Yv(p[1]), 16 * eOutBack(q), 0, 7); g.fillStyle = Y; g.fill(); T(brl(p[1]), X(i), Yv(p[1]) - 40, { f: 'Dosis', w: 800, s: 46, c: '#fff', a: 'center', al: q }); T(p[2].toUpperCase(), X(i), 990, { f: 'Dosis', w: 800, s: 24, ls: 4, c: Y, a: 'center', al: q }); });
       const bp = seg(lt, 3.3, 4.1); if (bp > 0) { pill('+28,6% em pedidos', 120, 520, { bg: '#fff', s: 26, al: eOutCubic(bp) }); pill('−20,4% no ticket', 120, 600, { bg: INK, c: Y, s: 26, al: eOutCubic(seg(lt, 3.6, 4.3)) }); }
       const fp = seg(lt, 4.3, 5.1); if (fp > 0) wrap('O novo cardápio recupera o ticket sem perder o volume.', 120, 760, 760, 56, { w: 800, s: 46, it: true, c: '#fff', al: eOutCubic(fp) });
     });
@@ -386,8 +340,8 @@
     layer(s, 1.12, () => { const e = eOutExpo(seg(lt, .4, 1.4)); phone(960, 90 + (1 - e) * 900, 470, 950, (w, h) => ifoodScreen(w, h, lt)); });
     layer(s, 1.3, () => {
       const tags = [['Âncora primeiro, selo no meio', 3.9, 330], ['Complemento = garçom', 7.3, 520], ['Bebida R$ 2 mais barata no combo', 8.5, 620], ['Doce dentro de todo combo', 9.7, 720]];
-      tags.forEach(([t, at, y]) => { const p = seg(lt, at, at + .5); if (p > 0) { g.save(); g.translate((1 - eOutExpo(p)) * 60, 0); pill(t, 1448, y, { bg: INK, c: Y, s: 18, al: eOutCubic(p) }); g.restore(); } });
-      const fp = seg(lt, 10.4, 11.1); if (fp > 0) { const e = eOutBack(fp, 2); g.save(); g.globalAlpha *= fp; glass(90, 780, 800, 190, 40, { ta: .3 }); g.restore(); T('TICKET DO PEDIDO', 120, 820, { f: 'Dosis', w: 800, s: 22, ls: 4, c: INK, al: fp }); g.save(); g.translate(120, 880); g.scale(e, e); T('R$ 148,90 → R$ 177,60', 0, 0, { f: 'Dosis', w: 800, s: 64, c: R }); g.restore(); T('+19% no pedido · CMV 27,7%', 120, 935, { w: 700, s: 30, c: INK, al: fp }); }
+      tags.forEach(([t, at, y]) => { const p = seg(lt, at, at + .5); if (p > 0) { g.save(); g.translate((1 - eOutExpo(p)) * 60, 0); pill(t, 1470, y, { bg: INK, c: Y, s: 19, al: eOutCubic(p) }); g.restore(); } });
+      const fp = seg(lt, 10.4, 11.1); if (fp > 0) { const e = eOutBack(fp, 2); T('TICKET DO PEDIDO', 120, 820, { f: 'Dosis', w: 800, s: 22, ls: 4, c: INK, al: fp }); g.save(); g.translate(120, 880); g.scale(e, e); T('R$ 148,90 → R$ 177,60', 0, 0, { f: 'Dosis', w: 800, s: 64, c: R }); g.restore(); T('+19% no pedido · CMV 27,7%', 120, 935, { w: 700, s: 30, c: INK, al: fp }); }
     });
   }
 
@@ -517,13 +471,13 @@
 
   /* ---------- CENA 8 · resultado + fecho ---------- */
   function sFim(s, lt) {
-    bg(R); orbs(lt, ['255,237,0', '90,0,0'], .26);
+    bg(R);
     const nums = [['CMV do mix', '28,8% → ', '27,7%', .3], ['Ticket médio', 'R$ 58,96 → ', 'R$ 63,85', 1.3], ['Margem bruta por mês', 'conversão estável · ', '+R$ 255 mil', 2.3]];
     const close = eInOutExpo(seg(lt, 3.9, 4.8));
     layer(s, 1, () => {
       g.save(); g.globalAlpha = 1 - close;
       T('PROJEÇÃO CONSERVADORA · BASE SET/2026', 120, 170, { f: 'Dosis', w: 800, s: 22, ls: 5, c: Y, al: seg(lt, .05, .4) });
-      nums.forEach((n, i) => { const p = seg(lt, n[3], n[3] + .6), y = 380 + i * 230; if (p <= 0) return; g.save(); g.globalAlpha *= eOutCubic(p); glass(90, y - 130, 1400, 210, 40, { ta: .2, ph: i * .3 }); g.restore(); T(n[0].toUpperCase(), 120, y - 70, { f: 'Dosis', w: 800, s: 24, ls: 4, c: '#fff', al: eOutCubic(p) }); T(n[1], 120, y + 30, { w: 700, s: 50, c: 'rgba(255,255,255,.75)', al: eOutCubic(p) }); g.font = F(700, 50); const off = n[1] ? g.measureText(n[1]).width : 0; rise(n[2], 120 + off + 10, y + 50, p, { s: i === 2 ? 150 : 110, c: Y, f: 'Dosis', it: false, w: 800 }); });
+      nums.forEach((n, i) => { const p = seg(lt, n[3], n[3] + .6), y = 380 + i * 230; if (p <= 0) return; T(n[0].toUpperCase(), 120, y - 70, { f: 'Dosis', w: 800, s: 24, ls: 4, c: '#fff', al: eOutCubic(p) }); T(n[1], 120, y + 30, { w: 700, s: 50, c: 'rgba(255,255,255,.75)', al: eOutCubic(p) }); g.font = F(700, 50); const off = n[1] ? g.measureText(n[1]).width : 0; rise(n[2], 120 + off + 10, y + 50, p, { s: i === 2 ? 150 : 110, c: Y, f: 'Dosis', it: false, w: 800 }); });
       g.restore();
     });
     if (close > 0) {
@@ -653,12 +607,10 @@
     AD.forEach(([a, b], i) => {
       const ti = 1 + i * 1.5, y = 330 + i * 135, xd = dv(y - 20), pa = seg(lt, ti - .5, ti - .2);
       if (pa <= 0) return;
-      const awa = txtW(a, 700, 44); g.save(); g.globalAlpha *= eOutCubic(pa); glass(xd - 70 - awa - 36, y - 56, awa + 72, 84, 42, { tint: '26,12,5', ta: .5, dark: true }); g.restore();
-      T(a, xd - 70, y, { w: 700, s: 44, c: 'rgba(255,255,255,.85)', a: 'right', al: eOutCubic(pa) });
+      T(a, xd - 70, y, { w: 700, s: 44, c: 'rgba(255,255,255,.62)', a: 'right', al: eOutCubic(pa) });
       g.save(); g.font = F(700, 44); const aw = g.measureText(a).width; g.restore();
       const sk = eOutExpo(seg(lt, ti - .15, ti + .05)); if (sk > 0) { g.save(); g.translate(xd - 80 - aw, y - 16); g.rotate(-.04); g.fillStyle = R; g.fillRect(0, 0, (aw + 20) * sk, 7); g.restore(); }
       const pb = seg(lt, ti, ti + .3); if (pb <= 0) return;
-      g.save(); g.globalAlpha *= clamp(pb * 3); glass(xd + 40, y - 74, 860, 100, 50, { ta: .34, ph: i * .25 }); g.restore();
       const fl = 1 - seg(lt, ti, ti + .25); if (fl > 0 && fl < 1) { g.save(); g.globalAlpha = fl * .75; g.fillStyle = '#fff'; g.fillRect(xd + 40, y - 70, 820, 92); g.restore(); }
       const e = eOutBack(pb, 2.4); g.save(); g.translate(xd, y - 16); g.scale(e, e); g.beginPath(); g.arc(0, 0, 30, 0, 7); g.fillStyle = INK; g.fill(); g.strokeStyle = Y; g.lineWidth = 6; g.lineCap = g.lineJoin = 'round'; g.beginPath(); g.moveTo(-11, 0); g.lineTo(11, 0); g.moveTo(3, -9); g.lineTo(12, 0); g.lineTo(3, 9); g.stroke(); g.restore();
       const sc = lerp(1.7, 1, eOutExpo(pb)); g.save(); g.translate(xd + 70, y - 18); g.scale(sc, sc); g.translate(-(xd + 70), -(y - 18)); T3(b, xd + 70, y, { s: 62, c: INK, ex: R, d: 4, a: 'left', al: clamp(pb * 4) }); g.restore();
@@ -743,7 +695,7 @@
     g.restore();
   }
   function render(t) {
-    t = clamp(t, 0, END - 0.001); GT = t;
+    t = clamp(t, 0, END - 0.001);
     let i = S.findIndex(s => t >= s.t0 && t < s.t1); if (i < 0) i = S.length - 1;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     // em transicao? (janela centrada na fronteira, alinhada a batida)
@@ -757,7 +709,7 @@
     const fa = flashAmp(t); if (fa > .01) { ctx.fillStyle = 'rgba(255,253,235,' + (.6 * fa).toFixed(3) + ')'; ctx.fillRect(0, 0, W, H); }
     g = ctx; // titulos de capitulo e barra por cima da composicao
     const sc = S[i];
-    if (sc.ch && j < 0) { const a = clamp(seg(t - sc.t0, .7, 1.2)) * (1 - seg(t, sc.t1 - 1, sc.t1 - .7)) * (sc.id === 'fim' ? 1 - seg(t, 75.6, 76) : 1); const dark = ['funil', 'app', 'porque'].includes(sc.id), red = ['ticket', 'fim'].includes(sc.id); { const lw = txtW(sc.ch.toUpperCase(), 800, 18, false, 'Dosis', 4) + 56; g.save(); g.globalAlpha *= a; glass(W - 120 - lw + 28, 62, lw, 54, 27, { ta: dark ? .22 : .3, dark: dark, blur: 20 }); g.restore(); } T(sc.ch.toUpperCase(), W - 120, 90, { f: 'Dosis', w: 800, s: 18, ls: 4, c: dark ? 'rgba(255,255,255,.95)' : red ? 'rgba(255,255,255,.95)' : 'rgba(26,12,5,.85)', a: 'right', al: a }); }
+    if (sc.ch && j < 0) { const a = clamp(seg(t - sc.t0, .7, 1.2)) * (1 - seg(t, sc.t1 - 1, sc.t1 - .7)) * (sc.id === 'fim' ? 1 - seg(t, 75.6, 76) : 1); const dark = ['funil', 'app', 'porque'].includes(sc.id), red = ['ticket', 'fim'].includes(sc.id); T(sc.ch.toUpperCase(), W - 120, 90, { f: 'Dosis', w: 800, s: 18, ls: 4, c: dark ? 'rgba(255,255,255,.6)' : red ? 'rgba(255,255,255,.8)' : 'rgba(26,12,5,.5)', a: 'right', al: a }); }
     ctx.fillStyle = 'rgba(0,0,0,.12)'; ctx.fillRect(0, H - 6, W, 6); ctx.fillStyle = Y; ctx.fillRect(0, H - 6, W * t / END, 6); ctx.fillStyle = R; ctx.fillRect(W * t / END - 14, H - 6, 14, 6);
     // brilho quente que respira com a musica (sutil, sem equalizador)
     const lv = music.level(t);

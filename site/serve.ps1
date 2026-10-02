@@ -18,7 +18,14 @@ while ($listener.IsListening) {
   $file = Join-Path $root $path
   $res = $ctx.Response
   try {
-    if (Test-Path $file -PathType Leaf) {
+    # POST /__save?f=nome.ext grava o corpo em ../entrega/ (usado para exportar o vídeo e quadros de conferência)
+    if ($ctx.Request.HttpMethod -eq 'POST' -and $path -eq '__save') {
+      $name = [IO.Path]::GetFileName($ctx.Request.QueryString['f'])
+      $dir = Join-Path (Split-Path -Parent $root) 'entrega'
+      New-Item -ItemType Directory -Force $dir | Out-Null
+      $fs = [IO.File]::Create((Join-Path $dir $name)); $ctx.Request.InputStream.CopyTo($fs); $fs.Close()
+      $b = [Text.Encoding]::UTF8.GetBytes("ok $name"); $res.OutputStream.Write($b, 0, $b.Length)
+    } elseif (Test-Path $file -PathType Leaf) {
       $ext = [IO.Path]::GetExtension($file).ToLower()
       $res.ContentType = $(if ($mime[$ext]) { $mime[$ext] } else { 'application/octet-stream' })
       $res.Headers.Add('Accept-Ranges', 'bytes')

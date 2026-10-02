@@ -13,11 +13,15 @@
   const eExpo = t => t <= 0 ? 0 : t >= 1 ? 1 : t < .5 ? Math.pow(2, 20 * t - 10) / 2 : (2 - Math.pow(2, -20 * t + 10)) / 2;
   const eBack = (t, s = 1.6) => 1 + (s + 1) * Math.pow(t - 1, 3) + s * Math.pow(t - 1, 2);
   const COR = o => o.cores || ['#FFED00', '#FF0000', '#1A0C05'];
+  const rrect = (c, x, y, w, h, r) => { r = Math.min(r, w / 2, h / 2); c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); };
+  // a arte do selo vem num quadrado com cantos brancos: amplia (logoK) para o vermelho tocar a borda do círculo
   function selo(c, o, x, y, r, rot = 0) {
     if (!o.logo || !o.logo.complete || r <= 1) return;
+    const k = o.logoK || 1.084;
     c.save(); c.translate(x, y); c.rotate(rot);
-    c.beginPath(); c.arc(0, 0, r * 1.05, 0, 7); c.fillStyle = '#fff'; c.fill();
-    c.beginPath(); c.arc(0, 0, r, 0, 7); c.clip(); c.drawImage(o.logo, -r, -r, r * 2, r * 2); c.restore();
+    c.shadowColor = 'rgba(0,0,0,.3)'; c.shadowBlur = r * .25; c.shadowOffsetY = r * .08;
+    c.beginPath(); c.arc(0, 0, r, 0, 7); c.fillStyle = '#E2231A'; c.fill(); c.shadowColor = 'transparent';
+    c.clip(); c.drawImage(o.logo, -r * k, -r * k, r * 2 * k, r * 2 * k); c.restore();
   }
 
   const T = {
@@ -85,6 +89,39 @@
       c.fillStyle = K; c.fillRect(0, 0, W, H);
       c.save(); c.translate(W / 2, H / 2); c.scale(Math.max(.001, sx), sy); c.translate(-W / 2, -H / 2); c.drawImage(fr ? A : B, 0, 0);
       c.fillStyle = `rgba(0,0,0,${.45 * (1 - sx)})`; c.fillRect(0, 0, W, H); c.restore();
+    },
+    /* TV desligando: A achata numa linha de luz, vira um ponto e apaga; B entra no escuro. */
+    tvoff(c, A, B, p, o = {}) {
+      const W = A.width, H = A.height;
+      c.fillStyle = '#000'; c.fillRect(0, 0, W, H);
+      if (p >= .5) { c.drawImage(B, 0, 0); return; }
+      const q = seg(p, 0, .5), sy = Math.max(.003, 1 - eIn(seg(q, 0, .55))), sx = Math.max(.002, 1 - eIn(seg(q, .55, 1)));
+      c.save(); c.translate(W / 2, H / 2); c.scale(sx, sy); c.translate(-W / 2, -H / 2); c.drawImage(A, 0, 0);
+      c.globalCompositeOperation = 'lighter'; c.fillStyle = `rgba(255,255,255,${seg(q, .25, .6)})`; c.fillRect(0, 0, W, H); c.restore();
+      const gl = c.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, 260 * sx + 40); gl.addColorStop(0, `rgba(255,250,220,${.9 * seg(q, .4, .7)})`); gl.addColorStop(1, 'rgba(255,250,220,0)');
+      c.fillStyle = gl; c.fillRect(0, 0, W, H);
+    },
+    /* Corte seco com soco de câmera: B entra 8% maior e assenta (corte na batida, como nos vídeos de app). */
+    punch(c, A, B, p, o = {}) {
+      const W = A.width, H = A.height;
+      if (p < .5) { c.drawImage(A, 0, 0); return; }
+      const q = seg(p, .5, 1), s = 1 + .08 * (1 - eOut(q));
+      c.save(); c.translate(W / 2, H / 2); c.scale(s, s); c.translate(-W / 2, -H / 2); c.drawImage(B, 0, 0); c.restore();
+      c.fillStyle = `rgba(255,255,255,${.3 * (1 - q)})`; c.fillRect(0, 0, W, H);
+    },
+    /* Encolhe em card: a cena A vira um card com cantos e sombra e voa para cima, revelando B. */
+    encolhe(c, A, B, p, o = {}) {
+      const W = A.width, H = A.height, k = eInOut(seg(p, 0, .55)), f = eIn(seg(p, .45, 1)), s = lerp(1, .62, k), r = lerp(0, 70, k), bs = lerp(1.06, 1, eOut(seg(p, .3, 1)));
+      c.save(); c.translate(W / 2, H / 2); c.scale(bs, bs); c.translate(-W / 2, -H / 2); c.drawImage(B, 0, 0); c.restore();
+      c.save(); c.translate(W / 2, H / 2 - f * H * 1.15); c.rotate(-.12 * f); c.scale(s, s);
+      c.shadowColor = 'rgba(0,0,0,.4)'; c.shadowBlur = 80; c.shadowOffsetY = 40; rrect(c, -W / 2, -H / 2, W, H, r / s); c.fillStyle = '#000'; c.fill(); c.shadowColor = 'transparent';
+      c.clip(); c.drawImage(A, -W / 2, -H / 2); c.restore();
+    },
+    /* Desliza: B empurra A para o lado, com rastro de movimento. */
+    desliza(c, A, B, p, o = {}) {
+      const W = A.width, e = eExpo(p), dir = o.dir || 1, v = Math.sin(p * Math.PI);
+      for (let k = 3; k >= 0; k--) { const off = dir * k * 60 * v; c.globalAlpha = k ? .22 * v : 1; c.drawImage(A, -dir * W * e + off, 0); c.drawImage(B, dir * W * (1 - e) + off, 0); }
+      c.globalAlpha = 1;
     },
     /* Painéis do manual: amarelo pela esquerda e vermelho pela direita fecham sobre A e abrem em B. */
     paineis(c, A, B, p, o = {}) {

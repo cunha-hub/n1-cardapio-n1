@@ -1,10 +1,10 @@
-/* N1 Chicken - Video de apresentacao horizontal (80 s), feito com a skill brag-motion.
-   Musica: faixa instrumental criada no Suno (assets/music/trilha-suno.mp3). Usa o trecho final da faixa (a partir de 1:42,8),
-   de modo que o video fecha junto com o final da musica. As cenas caem nos picos do audio:
-   49 s "E agora, apresentamos a voces..." · 54,9 s drop: "O novo cardapio da N1" · 69 s segundo drop: resultado · 76,3 s selo final.
-   Os efeitos (impactos, whooshes, pops e toques) vem de js/sfx-lancamento.js e sao misturados por cima da musica. */
+/* N1 Chicken - Video de apresentacao (90 s), feito com a skill brag-motion.
+   1a metade (0-40 s): informacao (BI, funil, como e hoje, o custo).
+   Virada (40-48 s): "E agora, apresentamos a voces... o novo cardapio da N1" com letras pulando da tela.
+   2a metade (48-90 s): lancamento (o novo cardapio, antes x depois, por que vende mais, resultado).
+   Trilha original (js/trilha-lancamento.js) com impactos que tremem e piscam a tela no mesmo instante. */
 (() => {
-  const W = 1920, H = 1080, END = 80, S0 = 102.81; // S0: onde o trecho usado comeca na faixa do Suno
+  const W = 1920, H = 1080, END = 90;
   const Y = '#FFED00', R = '#FF0000', R2 = '#C80000', INK = '#1A0C05', PAPER = '#FFFCEB', MUTE = '#7A6A5E', O1 = '#E0550F', Y2 = '#FFC928';
   const cv = document.getElementById('c'), ctx = cv.getContext('2d');
   const mk = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; };
@@ -44,51 +44,7 @@
   function rr(c, x, y, w, h, r, keep) { r = Math.min(r, w / 2, h / 2); if (!keep) c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
   function cover(im, x, y, w, h, fx = .5, fy = .5) { if (!im || !im.complete || !im.naturalWidth) { g.fillStyle = Y2; g.fillRect(x, y, w, h); return; } const s = Math.max(w / im.naturalWidth, h / im.naturalHeight), iw = im.naturalWidth * s, ih = im.naturalHeight * s; g.drawImage(im, x + (w - iw) * fx, y + (h - ih) * fy, iw, ih); }
   function wrap(str, x, y, maxW, lh, o) { g.save(); g.font = F(o.w || 400, o.s || 24, o.it, o.f); const words = str.split(' '); let line = '', yy = y; for (const w of words) { const t = line ? line + ' ' + w : w; if (g.measureText(t).width > maxW && line) { T(line, x, yy, o); line = w; yy += lh; } else line = t; } if (line) T(line, x, yy, o); g.restore(); return yy; }
-  function pill(str, x, y, o = {}) { g.save(); g.font = F(800, o.s || 20, false, 'Dosis'); if ('letterSpacing' in g) g.letterSpacing = '1.5px'; const w = g.measureText(str.toUpperCase()).width + (o.px || 28); const h = (o.s || 20) * 1.8; const ax = o.a === 'right' ? x - w : o.a === 'center' ? x - w / 2 : x; g.globalAlpha *= o.al == null ? 1 : o.al; if ((o.s || 20) >= 18 && !o.flat) glassPill(ax, y - h / 2, w, h, o.bg || Y); else { rr(g, ax, y - h / 2, w, h, h / 2); g.fillStyle = o.bg || Y; g.fill(); } if (o.bd) { g.strokeStyle = o.bd; g.lineWidth = 2; g.stroke(); } g.fillStyle = o.c || INK; g.textBaseline = 'middle'; g.fillText(str.toUpperCase(), ax + (o.px || 28) / 2, y + 1); g.restore(); return w; }
-
-  /* ---------- liquid glass ---------- */
-  let GT = 0; // tempo atual, para o reflexo que desliza pelo vidro
-  const rgbOf = c => { let h = String(c).replace('#', ''); if (h.length === 3) h = h.split('').map(z => z + z).join(''); const n = parseInt(h, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
-  function txtW(str, w, s, it, f, ls = 0) { g.save(); g.font = F(w, s, it, f); if ('letterSpacing' in g) g.letterSpacing = ls + 'px'; const v = g.measureText(str).width; g.restore(); return v; }
-  function fitS(str, maxW, w, f, s) { const m = txtW(str, w, s, false, f); return m > maxW ? s * maxW / m : s; }
-  /* vidro: fundo desfocado e levemente ampliado (lente), tinta translucida, brilho no topo, reflexo que desliza e borda de luz */
-  function glass(x, y, w, h, r, o = {}) {
-    if (w < 4 || h < 4) return;
-    const tint = o.tint || '255,255,255', ta = o.ta ?? .2, dark = !!o.dark;
-    g.save();
-    g.shadowColor = o.sh || 'rgba(26,12,5,.30)'; g.shadowBlur = o.blur ?? 34; g.shadowOffsetY = o.oy ?? 14; rr(g, x, y, w, h, r); g.fillStyle = 'rgba(' + tint + ',' + Math.max(.05, ta * .5) + ')'; g.fill(); g.shadowColor = 'transparent';
-    g.save(); rr(g, x, y, w, h, r); g.clip();
-    const m = g.getTransform(), pts = [[x, y], [x + w, y], [x, y + h], [x + w, y + h]].map(([px, py]) => [m.a * px + m.c * py + m.e, m.b * px + m.d * py + m.f]);
-    const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), pad = 28;
-    const sx = Math.max(0, x0 - pad), sy = Math.max(0, y0 - pad), ex = Math.min(g.canvas.width, x1 + pad), ey = Math.min(g.canvas.height, y1 + pad);
-    if (ex - sx > 2 && ey - sy > 2) {
-      g.setTransform(1, 0, 0, 1, 0, 0);
-      const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, k = 1.06;
-      g.filter = 'blur(' + (o.bl ?? 16) + 'px) saturate(1.6) brightness(' + (dark ? .9 : 1.08) + ')';
-      g.drawImage(g.canvas, sx, sy, ex - sx, ey - sy, cx + (sx - cx) * k, cy + (sy - cy) * k, (ex - sx) * k, (ey - sy) * k);
-      g.filter = 'none';
-    }
-    g.restore();
-    rr(g, x, y, w, h, r); const gr = g.createLinearGradient(x, y, x, y + h); gr.addColorStop(0, 'rgba(' + tint + ',' + (ta + .12) + ')'); gr.addColorStop(1, 'rgba(' + tint + ',' + ta + ')'); g.fillStyle = gr; g.fill();
-    g.save(); rr(g, x, y, w, h, r); g.clip();
-    const gl = g.createLinearGradient(x, y, x, y + h * .55); gl.addColorStop(0, 'rgba(255,255,255,' + (dark ? .22 : .38) + ')'); gl.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gl; g.fillRect(x, y, w, h * .55);
-    const sh = g.createLinearGradient(x, y + h * .55, x, y + h); sh.addColorStop(0, 'rgba(0,0,0,0)'); sh.addColorStop(1, 'rgba(0,0,0,' + (dark ? .28 : .12) + ')'); g.fillStyle = sh; g.fillRect(x, y + h * .55, w, h * .45);
-    const ph = ((GT * .22 + (o.ph || 0)) % 1.8) - .4, bw = Math.max(40, w * .16);
-    g.save(); g.translate(x + ph * w, y + h / 2); g.rotate(-.35); const sg = g.createLinearGradient(-bw, 0, bw, 0); sg.addColorStop(0, 'rgba(255,255,255,0)'); sg.addColorStop(.5, 'rgba(255,255,255,' + (dark ? .16 : .28) + ')'); sg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = sg; g.fillRect(-bw, -h, bw * 2, h * 2); g.restore();
-    g.restore();
-    rr(g, x + 1, y + 1, w - 2, h - 2, Math.max(1, r - 1)); const rg = g.createLinearGradient(x, y, x + w, y + h);
-    rg.addColorStop(0, 'rgba(255,255,255,.95)'); rg.addColorStop(.3, 'rgba(255,255,255,.22)'); rg.addColorStop(.7, 'rgba(255,255,255,.14)'); rg.addColorStop(1, 'rgba(255,255,255,.7)');
-    g.lineWidth = o.lw || 2; g.strokeStyle = rg; g.stroke();
-    g.restore();
-  }
-  function glassPill(x, y, w, h, bgc) { const c = rgbOf(bgc), lum = (c[0] * .3 + c[1] * .59 + c[2] * .11) / 255, white = lum > .93; glass(x, y, w, h, h / 2, { tint: c.join(','), ta: lum < .35 ? .5 : white ? .36 : .52, dark: lum < .35, blur: 22, oy: 10, ph: (x * .001) % 1 }); }
-  /* manchas de cor que derivam atras do vidro, para ele ter o que refratar */
-  function orbs(lt, cols, a = .22) {
-    [[1560, 800, 560, 0], [260, 940, 480, 1.9], [1760, 160, 400, 3.3]].forEach(([ox, oy, r, ph], k) => {
-      const cx = ox + Math.sin(lt * .4 + ph) * 130, cy = oy + Math.cos(lt * .31 + ph * 1.3) * 80, gr = g.createRadialGradient(cx, cy, 0, cx, cy, r), c = cols[k % cols.length];
-      gr.addColorStop(0, 'rgba(' + c + ',' + a + ')'); gr.addColorStop(1, 'rgba(' + c + ',0)'); g.fillStyle = gr; g.fillRect(cx - r, cy - r, r * 2, r * 2);
-    });
-  }
+  function pill(str, x, y, o = {}) { g.save(); g.font = F(800, o.s || 20, false, 'Dosis'); if ('letterSpacing' in g) g.letterSpacing = '1.5px'; const w = g.measureText(str.toUpperCase()).width + (o.px || 28); const h = (o.s || 20) * 1.8; const ax = o.a === 'right' ? x - w : o.a === 'center' ? x - w / 2 : x; rr(g, ax, y - h / 2, w, h, h / 2); g.fillStyle = o.bg || Y; g.globalAlpha *= o.al == null ? 1 : o.al; g.fill(); if (o.bd) { g.strokeStyle = o.bd; g.lineWidth = 2; g.stroke(); } g.fillStyle = o.c || INK; g.textBaseline = 'middle'; g.fillText(str.toUpperCase(), ax + (o.px || 28) / 2, y + 1); g.restore(); return w; }
 
   /* ---------- imagens ---------- */
   const load = src => { const i = new Image(); i.crossOrigin = 'anonymous'; i.src = src; return i; };
@@ -98,20 +54,20 @@
   const grain = document.createElement('canvas'); grain.width = grain.height = 256; { const gc = grain.getContext('2d'), d = gc.createImageData(256, 256); for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 22; } gc.putImageData(d, 0, 0); }
 
   /* ---------- cenas ---------- */
-  // rate = velocidade da coreografia original da cena (lt = (t - t0) * rate + off); a cena se ajusta ao trecho entre as batidas
+  // oD = duracao original da coreografia da cena; a cena e esticada/comprimida para caber em [t0, t1]
   const S = [
-    { id: 'intro', t0: 0, t1: 6, rate: 1, off: 2.0, ch: '' },                            // faixas ja abertas no 1o quadro; o selo bate na 1a pancada da musica (0,6 s)
-    { id: 'nums', t0: 6, t1: 15, rate: 9.5 / 9, ch: '01 · Onde estamos' },
-    { id: 'funil', t0: 15, t1: 24.5, rate: 10 / 9.5, ch: '02 · Onde o cliente sai' },
-    { id: 'hoje', t0: 24.5, t1: 41.5, rate: 14 / 17, ch: '03 · Como é hoje' },
-    { id: 'ticket', t0: 41.5, t1: 48.8, rate: .82, ch: '04 · O custo disso' },
-    { id: 'revela', t0: 48.8, t1: 56.9, rate: .984, ch: '' },                            // 51 a musica abre o break · 54,9 DROP
-    { id: 'ifood', t0: 56.9, t1: 63.9, rate: 1.69, ch: 'O novo cardápio · iFood' },
-    { id: 'antes', t0: 63.9, t1: 69.04, rate: 1.7, ch: '' },                             // 5 viradas na subida; a ultima, no 2o drop (69)
-    { id: 'fim', t0: 69.04, t1: END, rate: .59, ch: 'O resultado' }                      // numeros, e o selo bate em 76,3
+    { id: 'intro', t0: 0, t1: 6, oD: 7.5, ch: '' },
+    { id: 'nums', t0: 6, t1: 14, oD: 9.5, ch: '01 · Onde estamos' },
+    { id: 'funil', t0: 14, t1: 22, oD: 10, ch: '02 · Onde o cliente sai' },
+    { id: 'hoje', t0: 22, t1: 34, oD: 14, ch: '03 · Como é hoje' },
+    { id: 'ticket', t0: 34, t1: 40, oD: 6, ch: '04 · O custo disso' },
+    { id: 'revela', t0: 40, t1: 48, oD: 8, ch: '' },                      // 40 E agora · 42 apresentamos · 46 DROP
+    { id: 'ifood', t0: 48, t1: 58, oD: 14, ch: 'O novo cardápio · iFood' },
+    { id: 'antes', t0: 58, t1: 68, oD: 10, ch: '' },
+    { id: 'porque', t0: 68, t1: 80, oD: 12, ch: '' },
+    { id: 'fim', t0: 80, t1: END, oD: 7.5, ch: 'O resultado' }            // selo bate em 86
   ];
-  S.forEach((s, i) => { s.X = i * 100000; s.D = s.t1 - s.t0; if (s.rate == null) s.rate = s.oD / s.D; s.off = s.off || 0; });
-  const tOf = (id, lt) => { const sc = S.find(x => x.id === id); return sc.t0 + (lt - sc.off) / sc.rate; };
+  S.forEach((s, i) => { s.X = i * 100000; s.D = s.t1 - s.t0; });
   const TRANS = [ // transicao na saida de cada cena (meia-janela em segundos)
     { t: 'iris', h: .5, o: { r0: 240 } },
     { t: 'flaps', h: .5 },
@@ -120,20 +76,9 @@
     { t: 'tvoff', h: .35 },
     { t: 'faixas', h: .55 },
     { t: 'mergulho', h: .5, o: { cx: 1195, cy: 560 } },
+    { t: 'carta', h: .45 },
     { t: 'paineis', h: .55 }
   ];
-  // pancadas que tremem e piscam a tela; sao as mesmas do audio (e ganham um impacto sintetizado por cima)
-  const BREAK = [48.8, 54.9]; // trecho da virada: a musica muda de cara (abafada) ate o drop
-  const HITS = [[.6, .7], [48.8, .9], [51, .6], [54.9, 1.4], [69.04, 1.1], [76.3, 1]];
-  const EV = {
-    impacts: HITS,
-    whooshes: [[6, .1], [15, .1], [24.5, .1], [41.5, .1], [56.9, .14], [63.9, .12]],
-    risers: [[50.6, 54.8, .26]], crashes: [[54.3, 54.9, .26]],
-    falls: [[48.8, 49.9, .5]],
-    pulses: [[50.1, .45], [51.1, .5], [52, .5], [52.8, .55], [53.5, .55], [54.05, .6], [54.4, .6], [54.65, .65], [54.78, .7]],
-    pops: [7.55, 8.75, 9.95, 10.5].map(l => tOf('ifood', l)).concat([0, 1, 2, 3, 4].map(i => tOf('antes', 1 + 1.5 * i)), [.4, 1.4, 2.4].map(l => tOf('fim', l)), [1.5, 2.35, 3.2].map(l => tOf('ticket', l)), [3.7, 5.3, 7.3].map(l => tOf('funil', l))),
-    taps: [2.2, 3.6].map(l => tOf('ifood', l))
-  };
 
   /* camadas com paralaxe: f<1 fundo, f>1 frente (CX = deriva lenta da camera dentro da cena) */
   let CX = 0;
@@ -180,7 +125,7 @@
 
   /* ---------- CENA 1 · números ---------- */
   function sNums(s, lt) {
-    bg(PAPER); orbs(lt, ['255,237,0', '255,0,0'], .2);
+    bg(PAPER);
     layer(s, .6, () => { g.fillStyle = Y; g.globalAlpha = .55; g.beginPath(); g.arc(1650, 180, 330, 0, 7); g.fill(); g.globalAlpha = 1; });
     layer(s, 1, () => {
       T('BI TASTEFY · SETEMBRO/2026 · TODAS AS LOJAS N1', 120, 150, { f: 'Dosis', w: 800, s: 22, ls: 5, c: R, al: seg(lt, .2, .6) });
@@ -192,16 +137,15 @@
       g.save(); g.translate(-out * 900, 0); g.globalAlpha = 1 - out;
       const cards = [[517910, 0, '', '', 'visitas/mês na loja'], [60850, 0, '', '', 'pedidos em setembro'], [3.59, 2, 'R$ ', ' mi', 'de GMV no mês'], [34, 0, '', '%', 'dos pedidos da rede']];
       cards.forEach((c, i) => {
-        const p = seg(lt, .9 + i * .18, 2.8 + i * .18), x = 120 + i * 430, fs = Math.min(...cards.map(k => fitS(k[2] + nf(k[0], k[1]) + k[3], 330, 800, 'Dosis', 104)));
-        g.save(); g.globalAlpha *= clamp(p * 4); glass(x - 30, 470, 414, 296, 40, { ta: .28, ph: i * .3 }); g.restore();
-        T(c[2] + nf(c[0] * eOutExpo(p), c[1]) + c[3], x, 650, { f: 'Dosis', w: 800, s: fs, al: clamp(p * 3) });
+        const p = seg(lt, .9 + i * .18, 2.8 + i * .18), x = 120 + i * 430;
+        g.fillStyle = INK; g.globalAlpha = (1 - out) * clamp(p * 4); g.fillRect(x, 520, 390, 4); g.globalAlpha = 1 - out;
+        T(c[2] + nf(c[0] * eOutExpo(p), c[1]) + c[3], x, 650, { f: 'Dosis', w: 800, s: 104, al: clamp(p * 3) });
         T(c[4], x, 705, { w: 600, s: 30, c: MUTE, al: clamp(p * 3) });
       });
       g.restore();
     });
     const bp = seg(lt, 5.0, 6.8);
     if (bp > 0) layer(s, 1.15, () => {
-      g.save(); g.globalAlpha *= clamp(bp * 3); glass(90, 500, 1740, 560, 44, { ta: .26 }); g.restore();
       T('CONVERSÃO NO iFOOD · SET/26', 120, 540, { f: 'Dosis', w: 800, s: 22, ls: 5, c: MUTE, al: clamp(bp * 3) });
       const bars = [['Marmita Top', 14.93, INK], ['Brasileirinho', 13.99, INK], ['N1 Chicken', 11.75, R]];
       bars.forEach((b, i) => {
@@ -217,7 +161,7 @@
   /* ---------- CENA 2 · funil ---------- */
   const FUN = [100, 50.9, 20.3, 19.4, 11.2], FUNK = ['Visitas', 'Clicam num item', 'Põem na sacola', 'Checkout', 'Pedem'];
   function sFunil(s, lt) {
-    bg(INK); orbs(lt, ['255,0,0', '255,150,0'], .2);
+    bg(INK);
     layer(s, 1, () => {
       rise('De cada 100 que entram,', 120, 190, seg(lt, .3, 1.1), { s: 88, c: '#fff' });
       rise('só 11 pedem.', 120, 290, seg(lt, .5, 1.3), { s: 88, c: Y });
@@ -257,7 +201,7 @@
       if (c1 > 0) { pill('49% não clicam em nada', x0 + cw * .95, 330, { bg: '#fff', s: 22, al: eOutCubic(c1) }); }
       if (c2 > 0) { const pulse = 1 + Math.sin(lt * 8) * .03; g.save(); g.translate(x0 + cw * 1.95, 330); g.scale(pulse, pulse); pill('60% abrem o item e desistem', 0, 0, { bg: R, c: '#fff', s: 22, al: eOutCubic(c2) }); g.restore(); }
     });
-    if (c3 > 0) rise('É aqui que o cardápio perde a venda.', 1800, 1015, c3, { s: 44, c: '#fff', a: 'right' });
+    if (c3 > 0) rise('É aqui que o cardápio perde a venda.', 1800, 1040, c3, { s: 44, c: '#fff', a: 'right' });
   }
 
   /* ---------- CENA 3 · como é hoje (tira de filme) ---------- */
@@ -272,7 +216,7 @@
   const SH_W = 1000, SH_H = SH_W * 744 / 1568, SH_G = 70, SH_SP = 440;
   const shotT = i => (300 + (SH_W + SH_G) * i) / SH_SP;
   function sHoje(s, lt) {
-    bg(PAPER); orbs(lt, ['255,237,0', '255,0,0'], .18);
+    bg(PAPER);
     layer(s, .7, () => { g.fillStyle = Y; g.fillRect(-600, 700, W + 1200, 380); });
     layer(s, 1, () => {
       T('iFOOD · N1 CHICKEN VITÓRIA-ES · PRINTS DE 30/09/2026', 120, 130, { f: 'Dosis', w: 800, s: 22, ls: 5, c: R, al: seg(lt, .1, .5) });
@@ -295,7 +239,7 @@
         }
         g.restore();
         const lp = seg(lt, shotT(i) - .4, shotT(i) + .4);
-        if (lp > 0) { g.save(); g.globalAlpha = eOutCubic(lp); glass(x - 8, y + SH_H + 34, 76 + txtW(sh[1], 800, 36) + 48, 84, 42, { ta: .34, ph: i * .2 }); g.beginPath(); g.arc(x + 30, y + SH_H + 76, 28, 0, 7); g.fillStyle = R; g.fill(); T(String(i + 1), x + 30, y + SH_H + 87, { f: 'Dosis', w: 800, s: 30, c: '#fff', a: 'center' }); T(sh[1], x + 76, y + SH_H + 88, { w: 800, s: 36 }); g.restore(); }
+        if (lp > 0) { g.save(); g.globalAlpha = eOutCubic(lp); g.beginPath(); g.arc(x + 30, y + SH_H + 76, 28, 0, 7); g.fillStyle = R; g.fill(); T(String(i + 1), x + 30, y + SH_H + 87, { f: 'Dosis', w: 800, s: 30, c: '#fff', a: 'center' }); T(sh[1], x + 76, y + SH_H + 88, { w: 800, s: 36 }); g.restore(); }
       });
     });
     const cp = seg(lt, 1.2, 2);
@@ -307,10 +251,9 @@
 
   /* ---------- CENA 4 · ticket ---------- */
   function sTicket(s, lt) {
-    bg(R); orbs(lt, ['255,237,0', '90,0,0'], .26);
+    bg(R);
     layer(s, .7, () => { g.fillStyle = R2; for (let k = 0; k < 9; k++) g.fillRect(-600, 140 + k * 110, W + 1200, 2); });
     layer(s, 1, () => {
-      g.save(); g.globalAlpha *= seg(lt, 1, 1.6); glass(890, 330, 900, 700, 44, { ta: .2 }); g.restore();
       T('CAMPANHA MAUÁ · JUL → SET/2026', 120, 150, { f: 'Dosis', w: 800, s: 22, ls: 5, c: Y, al: seg(lt, .1, .5) });
       rise('O volume subiu.', 120, 260, seg(lt, .25, 1), { s: 96, c: '#fff' });
       rise('O ticket caiu.', 120, 370, seg(lt, .7, 1.5), { s: 96, c: Y });
@@ -320,7 +263,7 @@
       const segs = 2 * eInOutCubic(dp); g.moveTo(X(0), Yv(pts[0][1]));
       for (let i = 1; i <= 2; i++) { const f = clamp(segs - (i - 1)); if (f <= 0) break; g.lineTo(lerp(X(i - 1), X(i), f), lerp(Yv(pts[i - 1][1]), Yv(pts[i][1]), f)); }
       g.stroke(); g.restore();
-      pts.forEach((p, i) => { const q = seg(lt, 1.4 + i * .85, 1.9 + i * .85); if (q <= 0) return; g.beginPath(); g.arc(X(i), Yv(p[1]), 16 * eOutBack(q), 0, 7); g.fillStyle = Y; g.fill(); T(brl(p[1]), X(i), Yv(p[1]) + (i ? 78 : -40), { f: 'Dosis', w: 800, s: 46, c: '#fff', a: 'center', al: q }); T(p[2].toUpperCase(), X(i), 990, { f: 'Dosis', w: 800, s: 24, ls: 4, c: Y, a: 'center', al: q }); });
+      pts.forEach((p, i) => { const q = seg(lt, 1.4 + i * .85, 1.9 + i * .85); if (q <= 0) return; g.beginPath(); g.arc(X(i), Yv(p[1]), 16 * eOutBack(q), 0, 7); g.fillStyle = Y; g.fill(); T(brl(p[1]), X(i), Yv(p[1]) - 40, { f: 'Dosis', w: 800, s: 46, c: '#fff', a: 'center', al: q }); T(p[2].toUpperCase(), X(i), 990, { f: 'Dosis', w: 800, s: 24, ls: 4, c: Y, a: 'center', al: q }); });
       const bp = seg(lt, 3.3, 4.1); if (bp > 0) { pill('+28,6% em pedidos', 120, 520, { bg: '#fff', s: 26, al: eOutCubic(bp) }); pill('−20,4% no ticket', 120, 600, { bg: INK, c: Y, s: 26, al: eOutCubic(seg(lt, 3.6, 4.3)) }); }
       const fp = seg(lt, 4.3, 5.1); if (fp > 0) wrap('O novo cardápio recupera o ticket sem perder o volume.', 120, 760, 760, 56, { w: 800, s: 46, it: true, c: '#fff', al: eOutCubic(fp) });
     });
@@ -386,8 +329,8 @@
     layer(s, 1.12, () => { const e = eOutExpo(seg(lt, .4, 1.4)); phone(960, 90 + (1 - e) * 900, 470, 950, (w, h) => ifoodScreen(w, h, lt)); });
     layer(s, 1.3, () => {
       const tags = [['Âncora primeiro, selo no meio', 3.9, 330], ['Complemento = garçom', 7.3, 520], ['Bebida R$ 2 mais barata no combo', 8.5, 620], ['Doce dentro de todo combo', 9.7, 720]];
-      tags.forEach(([t, at, y]) => { const p = seg(lt, at, at + .5); if (p > 0) { g.save(); g.translate((1 - eOutExpo(p)) * 60, 0); pill(t, 1448, y, { bg: INK, c: Y, s: 18, al: eOutCubic(p) }); g.restore(); } });
-      const fp = seg(lt, 10.4, 11.1); if (fp > 0) { const e = eOutBack(fp, 2); g.save(); g.globalAlpha *= fp; glass(90, 780, 800, 190, 40, { ta: .3 }); g.restore(); T('TICKET DO PEDIDO', 120, 820, { f: 'Dosis', w: 800, s: 22, ls: 4, c: INK, al: fp }); g.save(); g.translate(120, 880); g.scale(e, e); T('R$ 148,90 → R$ 177,60', 0, 0, { f: 'Dosis', w: 800, s: 64, c: R }); g.restore(); T('+19% no pedido · CMV 27,7%', 120, 935, { w: 700, s: 30, c: INK, al: fp }); }
+      tags.forEach(([t, at, y]) => { const p = seg(lt, at, at + .5); if (p > 0) { g.save(); g.translate((1 - eOutExpo(p)) * 60, 0); pill(t, 1470, y, { bg: INK, c: Y, s: 19, al: eOutCubic(p) }); g.restore(); } });
+      const fp = seg(lt, 10.4, 11.1); if (fp > 0) { const e = eOutBack(fp, 2); T('TICKET DO PEDIDO', 120, 820, { f: 'Dosis', w: 800, s: 22, ls: 4, c: INK, al: fp }); g.save(); g.translate(120, 880); g.scale(e, e); T('R$ 148,90 → R$ 177,60', 0, 0, { f: 'Dosis', w: 800, s: 64, c: R }); g.restore(); T('+19% no pedido · CMV 27,7%', 120, 935, { w: 700, s: 30, c: INK, al: fp }); }
     });
   }
 
@@ -517,13 +460,13 @@
 
   /* ---------- CENA 8 · resultado + fecho ---------- */
   function sFim(s, lt) {
-    bg(R); orbs(lt, ['255,237,0', '90,0,0'], .26);
+    bg(R);
     const nums = [['CMV do mix', '28,8% → ', '27,7%', .3], ['Ticket médio', 'R$ 58,96 → ', 'R$ 63,85', 1.3], ['Margem bruta por mês', 'conversão estável · ', '+R$ 255 mil', 2.3]];
     const close = eInOutExpo(seg(lt, 3.9, 4.8));
     layer(s, 1, () => {
       g.save(); g.globalAlpha = 1 - close;
       T('PROJEÇÃO CONSERVADORA · BASE SET/2026', 120, 170, { f: 'Dosis', w: 800, s: 22, ls: 5, c: Y, al: seg(lt, .05, .4) });
-      nums.forEach((n, i) => { const p = seg(lt, n[3], n[3] + .6), y = 380 + i * 230; if (p <= 0) return; g.save(); g.globalAlpha *= eOutCubic(p); glass(90, y - 130, 1400, 210, 40, { ta: .2, ph: i * .3 }); g.restore(); T(n[0].toUpperCase(), 120, y - 70, { f: 'Dosis', w: 800, s: 24, ls: 4, c: '#fff', al: eOutCubic(p) }); T(n[1], 120, y + 30, { w: 700, s: 50, c: 'rgba(255,255,255,.75)', al: eOutCubic(p) }); g.font = F(700, 50); const off = n[1] ? g.measureText(n[1]).width : 0; rise(n[2], 120 + off + 10, y + 50, p, { s: i === 2 ? 150 : 110, c: Y, f: 'Dosis', it: false, w: 800 }); });
+      nums.forEach((n, i) => { const p = seg(lt, n[3], n[3] + .6), y = 380 + i * 230; if (p <= 0) return; T(n[0].toUpperCase(), 120, y - 70, { f: 'Dosis', w: 800, s: 24, ls: 4, c: '#fff', al: eOutCubic(p) }); T(n[1], 120, y + 30, { w: 700, s: 50, c: 'rgba(255,255,255,.75)', al: eOutCubic(p) }); g.font = F(700, 50); const off = n[1] ? g.measureText(n[1]).width : 0; rise(n[2], 120 + off + 10, y + 50, p, { s: i === 2 ? 150 : 110, c: Y, f: 'Dosis', it: false, w: 800 }); });
       g.restore();
     });
     if (close > 0) {
@@ -653,12 +596,10 @@
     AD.forEach(([a, b], i) => {
       const ti = 1 + i * 1.5, y = 330 + i * 135, xd = dv(y - 20), pa = seg(lt, ti - .5, ti - .2);
       if (pa <= 0) return;
-      const awa = txtW(a, 700, 44); g.save(); g.globalAlpha *= eOutCubic(pa); glass(xd - 70 - awa - 36, y - 56, awa + 72, 84, 42, { tint: '26,12,5', ta: .5, dark: true }); g.restore();
-      T(a, xd - 70, y, { w: 700, s: 44, c: 'rgba(255,255,255,.85)', a: 'right', al: eOutCubic(pa) });
+      T(a, xd - 70, y, { w: 700, s: 44, c: 'rgba(255,255,255,.62)', a: 'right', al: eOutCubic(pa) });
       g.save(); g.font = F(700, 44); const aw = g.measureText(a).width; g.restore();
       const sk = eOutExpo(seg(lt, ti - .15, ti + .05)); if (sk > 0) { g.save(); g.translate(xd - 80 - aw, y - 16); g.rotate(-.04); g.fillStyle = R; g.fillRect(0, 0, (aw + 20) * sk, 7); g.restore(); }
       const pb = seg(lt, ti, ti + .3); if (pb <= 0) return;
-      g.save(); g.globalAlpha *= clamp(pb * 3); glass(xd + 40, y - 74, 860, 100, 50, { ta: .34, ph: i * .25 }); g.restore();
       const fl = 1 - seg(lt, ti, ti + .25); if (fl > 0 && fl < 1) { g.save(); g.globalAlpha = fl * .75; g.fillStyle = '#fff'; g.fillRect(xd + 40, y - 70, 820, 92); g.restore(); }
       const e = eOutBack(pb, 2.4); g.save(); g.translate(xd, y - 16); g.scale(e, e); g.beginPath(); g.arc(0, 0, 30, 0, 7); g.fillStyle = INK; g.fill(); g.strokeStyle = Y; g.lineWidth = 6; g.lineCap = g.lineJoin = 'round'; g.beginPath(); g.moveTo(-11, 0); g.lineTo(11, 0); g.moveTo(3, -9); g.lineTo(12, 0); g.lineTo(3, 9); g.stroke(); g.restore();
       const sc = lerp(1.7, 1, eOutExpo(pb)); g.save(); g.translate(xd + 70, y - 18); g.scale(sc, sc); g.translate(-(xd + 70), -(y - 18)); T3(b, xd + 70, y, { s: 62, c: INK, ex: R, d: 4, a: 'left', al: clamp(pb * 4) }); g.restore();
@@ -730,11 +671,11 @@
   const DRAW = { intro: sIntro, nums: sNums, funil: sFunil, hoje: sHoje, ticket: sTicket, revela: sRevela, ifood: sIfood, antes: sAntes, porque: sPorque, app: sApp, cmv: sCmv, fim: sFim };
 
   /* ---------- render ---------- */
-  const MT = window.MotionT, IMP = HITS;
+  const MT = window.MotionT, IMP = window.N1Trilha.IMPACTOS;
   const impAmp = t => { let a = 0; for (const [ti, k] of IMP) { const d = t - ti; if (d >= 0 && d < 1.2) a += k * Math.exp(-d / .22); } return a; };
   const flashAmp = t => { let a = 0; for (const [ti, k] of IMP) { const d = t - ti; if (k >= .8 && d >= 0 && d < .4) a = Math.max(a, Math.min(1, k) * Math.exp(-d / .07)); } return a; };
   function drawScene(i, t, gctx) {
-    const s = S[i], lt = (t - s.t0) * s.rate + s.off, prog = clamp((t - s.t0) / s.D);
+    const s = S[i], lt = (t - s.t0) * s.oD / s.D, prog = clamp((t - s.t0) / s.D);
     g = gctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
     CX = s.X + lerp(-26, 26, prog);
     const z = 1 + 0.02 * prog; // empurrao lento de camera
@@ -743,7 +684,7 @@
     g.restore();
   }
   function render(t) {
-    t = clamp(t, 0, END - 0.001); GT = t;
+    t = clamp(t, 0, END - 0.001);
     let i = S.findIndex(s => t >= s.t0 && t < s.t1); if (i < 0) i = S.length - 1;
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     // em transicao? (janela centrada na fronteira, alinhada a batida)
@@ -757,7 +698,7 @@
     const fa = flashAmp(t); if (fa > .01) { ctx.fillStyle = 'rgba(255,253,235,' + (.6 * fa).toFixed(3) + ')'; ctx.fillRect(0, 0, W, H); }
     g = ctx; // titulos de capitulo e barra por cima da composicao
     const sc = S[i];
-    if (sc.ch && j < 0) { const a = clamp(seg(t - sc.t0, .7, 1.2)) * (1 - seg(t, sc.t1 - 1, sc.t1 - .7)) * (sc.id === 'fim' ? 1 - seg(t, 75.6, 76) : 1); const dark = ['funil', 'app', 'porque'].includes(sc.id), red = ['ticket', 'fim'].includes(sc.id); { const lw = txtW(sc.ch.toUpperCase(), 800, 18, false, 'Dosis', 4) + 56; g.save(); g.globalAlpha *= a; glass(W - 120 - lw + 28, 62, lw, 54, 27, { ta: dark ? .22 : .3, dark: dark, blur: 20 }); g.restore(); } T(sc.ch.toUpperCase(), W - 120, 90, { f: 'Dosis', w: 800, s: 18, ls: 4, c: dark ? 'rgba(255,255,255,.95)' : red ? 'rgba(255,255,255,.95)' : 'rgba(26,12,5,.85)', a: 'right', al: a }); }
+    if (sc.ch && j < 0) { const a = clamp(seg(t - sc.t0, .7, 1.2)) * (1 - seg(t, sc.t1 - 1, sc.t1 - .7)) * (sc.id === 'fim' ? 1 - seg(t, 84.8, 85.2) : 1); const dark = ['funil', 'app', 'porque'].includes(sc.id), red = ['ticket', 'fim'].includes(sc.id); T(sc.ch.toUpperCase(), W - 120, 90, { f: 'Dosis', w: 800, s: 18, ls: 4, c: dark ? 'rgba(255,255,255,.6)' : red ? 'rgba(255,255,255,.8)' : 'rgba(26,12,5,.5)', a: 'right', al: a }); }
     ctx.fillStyle = 'rgba(0,0,0,.12)'; ctx.fillRect(0, H - 6, W, 6); ctx.fillStyle = Y; ctx.fillRect(0, H - 6, W * t / END, 6); ctx.fillStyle = R; ctx.fillRect(W * t / END - 14, H - 6, 14, 6);
     // brilho quente que respira com a musica (sutil, sem equalizador)
     const lv = music.level(t);
@@ -770,35 +711,15 @@
   }
   window.__render = render;
 
-  /* =================== MUSICA (Suno) + EFEITOS (js/sfx-lancamento.js) =================== */
-  const MUSIC = 'assets/music/trilha-suno.mp3';
+  /* =================== TRILHA original (js/trilha-lancamento.js) =================== */
   const music = (() => {
-    let buf = null, env = null, ac = null, gain = null, dest = null, src = null, t0 = 0, from = 0, on = false; const FPS = 30, SR = 48000;
-    const ready = (async () => {
-      await new Promise(r => setTimeout(r, 60));
-      const [raw, sfx] = await Promise.all([fetch(MUSIC).then(r => r.arrayBuffer()), window.N1Sfx.render(END, EV, SR)]);
-      const dec = await new OfflineAudioContext(2, 1, SR).decodeAudioData(raw);
-      // normaliza o trecho usado da musica para pico de 0,8
-      let pk = 0; for (let c = 0; c < dec.numberOfChannels; c++) { const d = dec.getChannelData(c); for (let i = Math.floor(S0 * SR); i < d.length; i++) { const a = Math.abs(d[i]); if (a > pk) pk = a; } }
-      const oc = new OfflineAudioContext(2, Math.ceil(END * SR), SR);
-      const lim = oc.createDynamicsCompressor(); lim.threshold.value = -5; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = .001; lim.release.value = .12; lim.connect(oc.destination);
-      const ms = oc.createBufferSource(); ms.buffer = dec; const mg = oc.createGain(), K = pk > 0 ? .8 / pk : 1;
-      // a virada: "E AGORA" abafa a musica (como se fosse para outra sala), a subida fica fechada, e o drop abre tudo de uma vez
-      const fl = oc.createBiquadFilter(); fl.type = 'lowpass'; fl.Q.value = .8; fl.frequency.setValueAtTime(20000, 0);
-      fl.frequency.setValueAtTime(20000, BREAK[0]); fl.frequency.exponentialRampToValueAtTime(650, BREAK[0] + .45); fl.frequency.setValueAtTime(650, BREAK[1] - .6); fl.frequency.exponentialRampToValueAtTime(2200, BREAK[1] - .06); fl.frequency.setValueAtTime(20000, BREAK[1]);
-      mg.gain.setValueAtTime(0, 0); mg.gain.linearRampToValueAtTime(K, .12);
-      mg.gain.setValueAtTime(K, BREAK[0]); mg.gain.linearRampToValueAtTime(K * .55, BREAK[0] + .45); mg.gain.setValueAtTime(K * .55, BREAK[1] - .6); mg.gain.linearRampToValueAtTime(K * .12, BREAK[1] - .08); mg.gain.setValueAtTime(K * 1.12, BREAK[1]); mg.gain.linearRampToValueAtTime(K, BREAK[1] + .5);
-      ms.connect(fl); fl.connect(mg); mg.connect(lim);
-      const ss = oc.createBufferSource(); ss.buffer = sfx; const sg = oc.createGain(); sg.gain.value = .6; ss.connect(sg); sg.connect(lim);
-      ms.start(0, S0, END); ss.start(0);
-      const b = await oc.startRendering();
-      let q = 0; for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < d.length; i++) { const a = Math.abs(d[i]); if (a > q) q = a; } }
-      if (q > .95) for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < d.length; i++) d[i] *= .95 / q; }
+    let buf = null, env = null, ac = null, gain = null, dest = null, src = null, t0 = 0, from = 0, on = false; const FPS = 30;
+    const ready = new Promise(r => setTimeout(r, 60)).then(() => window.N1Trilha.render(END)).then(b => {
       buf = b; const d = b.getChannelData(0), step = Math.floor(b.sampleRate / FPS), n = Math.floor(d.length / step), v = new Float32Array(n);
-      for (let k = 0; k < n; k++) { let z = 0; for (let x = k * step, e = x + step; x < e; x++) z += d[x] * d[x]; v[k] = Math.sqrt(z / step); }
+      for (let k = 0; k < n; k++) { let q = 0; for (let x = k * step, e = x + step; x < e; x++) q += d[x] * d[x]; v[k] = Math.sqrt(q / step); }
       const sorted = Array.from(v).sort((a, b) => a - b), ref = sorted[Math.floor(n * .95)] || 1, lo = sorted[Math.floor(n * .2)] || 0;
       env = v.map(x => clamp((x - lo) / (ref - lo))); return b;
-    })();
+    });
     function wire() { if (ac) return; ac = new AudioContext({ sampleRate: 48000 }); gain = ac.createGain(); gain.gain.value = .95; gain.connect(ac.destination); dest = ac.createMediaStreamDestination(); gain.connect(dest); }
     return {
       ready, get buffer() { return buf; },
@@ -890,7 +811,7 @@
   /* primeiro quadro (pôster) quando as fontes e imagens carregarem */
   const FONTS = ['400', '500', '600', '700', '800', '900', 'italic 800', 'italic 900'].map(w => `${w} 40px "Fira Sans"`).concat(['600 40px "Dosis"', '700 40px "Dosis"', '800 40px "Dosis"']);
   const fontsReady = Promise.all([...FONTS.map(f => document.fonts.load(f).catch(() => null)), new Promise(r => { if (im.logo.complete) r(); else { im.logo.onload = r; im.logo.onerror = r; } })]);
-  fontsReady.then(() => { render(1.4); ui(); });
+  fontsReady.then(() => { render(4.2); ui(); });
   { const lb = $('#start small'); if (lb) { const txt = lb.textContent; lb.textContent = 'Preparando a trilha…'; music.ready.then(() => { lb.textContent = txt; }); } }
   render(0);
   if (/[?&]t=([\d.]+)/.test(location.search)) { tNow = +RegExp.$1; setTimeout(() => render(tNow), 800); }
