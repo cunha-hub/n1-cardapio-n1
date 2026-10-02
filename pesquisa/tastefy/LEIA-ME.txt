@@ -1,0 +1,4 @@
+Versão "Assistente Tastefy" (a boca), guardada em 02/10/2026 e retirada do site a pedido.
+Ela pergunta o que a pessoa quer comer e com quem, e entende texto livre.
+Para retomar: copie index.html, site.css, site.js e assistente.js desta pasta de volta para site/ (site.css e site.js em site/css e site/js).
+Os testes (teste_tastefy.js) esperam estes arquivos em site/ e rodam com: bun teste_tastefy.js (ajuste os caminhos ../site/js para ../../site/js).

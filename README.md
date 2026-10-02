@@ -10,7 +10,7 @@ Novo cardápio navegável de alta conversão para a N1 Chicken (Tastefy), com v�
 - **Diagnóstico:** números e funil do BI, antes × depois com prints reais do iFood (Vitória-ES, 30/09/2026) e as 4 correções principais.
 - **CMV 28%:** todo preço é o menor valor terminado em ,90 com (custo + embalagem) ÷ preço ≤ 28%. Os custos vêm da planilha *CMV 2026 – Nova Operação*.
 - **Cardápio no celular:** 7 categorias e 32 itens, com complementos iguais aos do iFood e sacola. No computador, ele aparece dentro de um celular (com QR code para abrir no seu); no celular, ocupa a tela inteira, como um app.
-- **Assistente Tastefy (a boca na bolinha do canto):** pergunta "O que tá afim de comer hoje?", com quem a pessoa vai comer, o tamanho da fome e a ocasião, ou entende uma frase livre como "frango pra ver o jogo com 4 amigos". Hoje está ligado ao cardápio da N1 Chicken. Se pedirem algo que o cardápio não tem (pizza, sushi), avisa e sugere o que existe.
+- **Visão app:** Assistente N1 com IA (a bolinha no canto), Modo Jogo e N1 Points.
 - **Vídeo de apresentação (1m20, horizontal):** feito em canvas com a skill brag-motion (adaptação do [brag](https://github.com/latent-spaces/brag), MIT). Tem 8 transições da marca (`site/js/motion-transitions.js`), efeito liquid glass e cenas encaixadas nos picos da música. `site/video.html` tem o botão **Exportar MP4**.
 - **Música:** faixa instrumental gerada no Suno (plano Free, uso não comercial), em `site/assets/music/trilha-suno.mp3`; os efeitos sonoros são sintetizados em `site/js/sfx-lancamento.js`.
 - **Projeção:** com a conversão estável, +R$ 298 mil/mês de GMV e +R$ 255 mil/mês de margem bruta.
@@ -33,12 +33,12 @@ Os custos e a regra dos 28% estão em `pesquisa/precificar_cmv28.js`. O efeito n
 cd pesquisa && bun precificar_cmv28.js > precos_cmv28.json && bun impacto_mix.js && bun projecao.js
 ```
 
-## Testar o Assistente Tastefy
+## Testar o Assistente N1
 
-A lógica de recomendação fica em `site/js/assistente.js`. O teste antigo roda 194 conversas e confere as regras de coerência; o novo roda 7.200 combinações de desejo × companhia × fome × ocasião × horário e confere frases livres:
+A lógica de recomendação fica em `site/js/assistente.js`. O teste roda as 48 combinações de respostas, confere as regras de coerência e gera `pesquisa/testes_assistente.md`:
 
 ```
-cd pesquisa && bun teste_assistente.js && bun teste_tastefy.js
+cd pesquisa && bun teste_assistente.js
 ```
 
 A revisão feita por um agente de IA sobre essas conversas está em `pesquisa/revisao_ia_assistente.md`.

@@ -195,7 +195,7 @@
       <div data-rv><b>Semana 0</b><h5>Cardápio mestre</h5><p>32 itens, preços em CMV 28% e fotos das sobremesas.</p></div>
       <div data-rv><b>Semanas 1–4</b><h5>Piloto em 3 lojas</h5><p>Vitória, Guarapari e Uberaba contra 3 lojas-controle.</p></div>
       <div data-rv><b>Semanas 5–6</b><h5>Ajuste</h5><p>Popularidade × margem em reais por item.</p></div>
-      <div data-rv><b>Semana 7+</b><h5>Rede + app</h5><p>72 lojas no iFood e o app com o Assistente N1.</p></div>
+      <div data-rv><b>Semana 7+</b><h5>Rede + app</h5><p>72 lojas no iFood e o app com o Assistente Tastefy.</p></div>
     </div>
     <p class="disc" data-rv>Premissas: pedidos de setembro/2026 (60.850) mantidos; preços novos aplicados ao mix real de jul–set (+4,1%); adesão aos complementos conforme a ponte acima, a validar no piloto. Se a conversão subir 0,8 p.p., o ganho de GMV chega a +R$ 563 mil/mês. Custos: planilha CMV 2026 (corte mais caro, com embalagem).</p>
   </div>
@@ -211,11 +211,12 @@
 <!-- sacola / modal / assistente / lightbox -->
 <div class="lightbox" id="lightbox" role="dialog" aria-label="Print do iFood"><img alt=""><button aria-label="Fechar">×</button></div>
 
-<button class="ai-fab hint" id="aiFab" aria-label="Abrir Assistente N1"><img alt="" src="https://static.ifood-static.com.br/image/upload/t_thumbnail/logosgde/8adf268a-29f7-4b0f-9952-db64720acd56/202607281749_IHL5.jpeg"><span class="bub">Precisa de ajuda para escolher?</span></button>
-<div class="ai-panel" id="aiPanel" role="dialog" aria-label="Assistente N1">
-  <div class="ch-h"><img alt="" src="https://static.ifood-static.com.br/image/upload/t_thumbnail/logosgde/8adf268a-29f7-4b0f-9952-db64720acd56/202607281749_IHL5.jpeg"><div>Assistente N1<small>Monto seu pedido em 10 segundos</small></div><button id="aiClose" aria-label="Fechar">×</button></div>
+<button class="ai-fab hint" id="aiFab" aria-label="Abrir Assistente Tastefy"><span class="mth" data-mouth></span><span class="bub">Bateu a fome? Fala comigo</span></button>
+<div class="ai-panel" id="aiPanel" role="dialog" aria-label="Assistente Tastefy">
+  <div class="ch-h"><span class="mth" data-mouth></span><div>Assistente Tastefy<small>Te ajudo a escolher o que pedir, sozinho ou acompanhado</small></div><button id="aiClose" aria-label="Fechar">×</button></div>
   <div class="ch-b" id="aiBody"></div>
-  <div class="ch-f">Protótipo da visão app · sugestões do cardápio mestre</div>
+  <form class="ch-f" id="aiForm" autocomplete="off"><input id="aiInput" type="text" maxlength="140" placeholder="Ou escreva o que quer comer…" aria-label="Escreva o que você quer comer"><button type="submit" aria-label="Enviar">➤</button></form>
+  <div class="ch-n">Protótipo · hoje conectado ao cardápio da N1 Chicken</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
