@@ -113,7 +113,7 @@
     const fo = FOME[resp.fome], D = resp.desejo == null ? null : DESEJO[resp.desejo], Q = resp.quem == null ? null : QUEM[resp.quem];
     let oc = D && D.id === 'prato' ? OCASIAO[2] : OCASIAO[resp.ocasiao == null ? 3 : resp.ocasiao], nota = '';
     const hora = resp.hora == null ? 12 : resp.hora;
-    if (oc.id === 'almoco' && (hora < 11 || hora >= 15)) { nota = (D && D.id === 'prato' ? 'O prato feito N1 sai' : 'O almoço N1 sai') + ' das 11h às 15h, então agora te mostro os combos 😉 '; oc = OCASIAO[3]; }
+    if (oc.id === 'almoco' && (hora < 11 || hora >= 15)) { nota = (D && D.id === 'prato' ? 'O prato feito N1 sai' : 'O almoço N1 sai') + ' das 11h às 15h, então agora te mostro os combos '; oc = OCASIAO[3]; }
     const n = g.n, need = r2(n * fo.f);
     // ordenação: preço + R$ 8 por caixa extra (menos embalagens é melhor); o preço exibido continua o real
     const custo = o => o.price + 8 * (o.ids.filter(id => CAP[id].multi || CAP[id].grupo).length - 1);
@@ -157,7 +157,7 @@
         if (o.ids.length === 1 && UPGRADE[o.ids[0]]) {
           const up = montar(menu, [UPGRADE[o.ids[0]]]), dif = r2(up.price - o.price);
           return { tipo: 'troca', qtd: 1, total: dif, nome: 'troca pro ' + up.nome, troca: up,
-            texto: 'Por <b>+ ' + real(dif) + '</b> eu troco pro ' + up.nome + ', que já vem com brigadeiro 😉 Bora?', botoes: [{ label: 'Bora, troca!', qtd: 1 }, { label: 'Não, valeu', qtd: 0 }] };
+            texto: 'Por <b>+ ' + real(dif) + '</b> eu troco pro ' + up.nome + ', que já vem com brigadeiro Bora?', botoes: [{ label: 'Bora, troca!', qtd: 1 }, { label: 'Não, valeu', qtd: 0 }] };
         }
         const q = faltamDoce, total = r2(q * BRIG);
         return { tipo: 'doce', qtd: q, total, nome: q + '× Brigadeiro N1',

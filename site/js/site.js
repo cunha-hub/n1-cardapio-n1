@@ -400,14 +400,14 @@
       txt = (txt || '').trim(); if (!txt) return;
       me(txt);
       const p = AS.interpretar(txt), fora = p.fora; delete p.fora;
-      if (fora) bot('Ainda não tenho <b>' + fora + '</b> por aqui \u{1f605} Hoje eu estou no cardápio da <b>N1 Chicken</b>: posso te indicar frango crocante, burger, petisco, prato feito ou um docinho.', 600);
-      if (!Object.keys(p).length) { if (!fora) bot('Hmm, essa eu não peguei \u{1f605} Toca numa opção ou me conta assim: <i>"frango pra ver o jogo com 4 amigos"</i>.', 500); return; }
+      if (fora) bot('Ainda não tenho <b>' + fora + '</b> por aqui Hoje eu estou no cardápio da <b>N1 Chicken</b>: posso te indicar frango crocante, burger, petisco, prato feito ou um docinho.', 600);
+      if (!Object.keys(p).length) { if (!fora) bot('Hmm, essa eu não peguei Toca numa opção ou me conta assim: <i>"frango pra ver o jogo com 4 amigos"</i>.', 500); return; }
       Object.assign(S, p);
       if (pending) { const { w, res } = pending; pending = null; w.remove(); res({ texto: true }); }
     }
     async function run() {
       body.innerHTML = ''; S = {}; pending = null;
-      await bot('Oi! Eu sou a <b>boca do Tastefy</b> \u{1f444} Te ajudo a escolher o que pedir, sozinho ou acompanhado.', 500);
+      await bot('Oi! Eu sou a <b>boca do Tastefy</b>. Te ajudo a escolher o que pedir, sozinho ou acompanhado.', 500);
       await bot('Toca numa opção ou escreve do seu jeito, tipo <i>"frango pra ver o jogo com 4 amigos"</i>. Hoje estou no cardápio da <b>N1 Chicken</b>.', 600);
       await q('desejo', 'O que tá afim de comer hoje?', AS.DESEJO.map(d => d.label));
       if (S.pessoas == null) {
@@ -417,7 +417,7 @@
         if (S.pessoas == null) await q('pessoas', 'Quantos vão, contando você?', ['3', '4', '5 ou mais'], 2);
       }
       if (S.pessoas === 4 && S.grande == null) await q('grande', 'Opa, galera! Quantas pessoas?', AS.GRANDE.map(g => g.label));
-      await q('fome', 'E o tamanho da fome? \u{1f605}', AS.FOME.map(f => f.label));
+      await q('fome', 'E o tamanho da fome?', AS.FOME.map(f => f.label));
       if (S.desejo === 3) S.ocasiao = 2; else await q('ocasiao', 'É pra quê?', AS.OCASIAO.map(o => o.label));
       const pl = AS.plano({ pessoas: S.pessoas, grande: S.grande, fome: S.fome, ocasiao: S.ocasiao, desejo: S.desejo, quem: S.quem, hora: new Date().getHours() }, allItems);
       await bot(pl.intro, 700);
@@ -445,7 +445,7 @@
           opts.onAdd(Object.assign({}, it, { name: nome }), Math.round((it.price * q + (k === 0 ? somaExtra : 0)) * 100) / 100, notas);
         });
       }
-      await bot('Fechado! <b>' + final.nome + '</b>' + (nomeExtra ? ' + ' + nomeExtra : '') + ' = <b>' + brl(total) + '</b>. Já coloquei na sua sacola \u{1f609}', 800);
+      await bot('Fechado! <b>' + final.nome + '</b>' + (nomeExtra ? ' + ' + nomeExtra : '') + ' = <b>' + brl(total) + '</b>. Já coloquei na sua sacola.', 800);
       const again = document.createElement('div'); again.className = 'qr';
       again.innerHTML = '<button>Montar outro</button><button>Ver sacola</button>';
       again.children[0].onclick = () => run();
