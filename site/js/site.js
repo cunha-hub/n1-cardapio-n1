@@ -63,7 +63,7 @@
   let fallbackOn = false;
   function startCanvasFallback() {
     if (fallbackOn || useVideo) return; fallbackOn = true;
-    video.hidden = true; canvas.hidden = false; $('#heroNote').hidden = false;
+    video.hidden = true; canvas.hidden = false;
     const ctx = canvas.getContext('2d');
     const srcs = [IMG.comboM, IMG.caixaG, IMG.superCombo, IMG.bitesM, IMG.comboGG, IMG.bbc, IMG.burgers2, IMG.comboP, IMG.salada, IMG.rings, IMG.caixaM, IMG.garlic, IMG.comboG, IMG.batata, IMG.trio];
     const imgs = srcs.map(s => { const i = new Image(); i.crossOrigin = 'anonymous'; i.src = s; return i; });
@@ -276,7 +276,7 @@
     const ref = inPhone() ? scroller.getBoundingClientRect().top + nav.offsetHeight + 12 : 64 + nav.offsetHeight + 16;
     let cur = blocks[0];
     for (const b of blocks) if (b.getBoundingClientRect().top <= ref) cur = b;
-    $$('button', nav).forEach(btn => { const on = 'cat-' + btn.dataset.cat === cur.id; if (on && !btn.classList.contains('on')) btn.scrollIntoView({ block: 'nearest', inline: 'center' }); btn.classList.toggle('on', on); });
+    $$('button', nav).forEach(btn => { const on = 'cat-' + btn.dataset.cat === cur.id; if (on && !btn.classList.contains('on')) nav.scrollTo({ left: btn.offsetLeft - (nav.clientWidth - btn.offsetWidth) / 2, behavior: 'smooth' }); btn.classList.toggle('on', on); });
   }
   scroller.addEventListener('scroll', syncCat, { passive: true }); addEventListener('scroll', syncCat, { passive: true });
   $$('button', nav).forEach(btn => btn.addEventListener('click', () => {

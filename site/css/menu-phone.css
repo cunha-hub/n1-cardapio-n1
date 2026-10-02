@@ -15,9 +15,9 @@
 .qr-box small { color: var(--mute); font-size: 13px; line-height: 1.4; }
 
 /* moldura */
-.mp-phone { position: relative; width: 400px; height: min(820px, 88vh); min-height: 620px; border-radius: 56px; background: #120806; padding: 12px; box-shadow: 0 50px 100px rgba(142,0,0,.28), inset 0 0 0 2px #3c2a20; }
+.mp-phone { position: relative; width: 400px; height: min(820px, calc(88vh / var(--z))); min-height: 620px; border-radius: 56px; background: #120806; padding: 12px; box-shadow: 0 50px 100px rgba(142,0,0,.28), inset 0 0 0 2px #3c2a20; }
 .mp-notch { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); width: 112px; height: 30px; border-radius: 20px; background: #120806; z-index: 30; }
-.mp-screen { position: relative; height: 100%; border-radius: 44px; overflow: hidden; background: #fff; transform: translateZ(0); /* elementos fixed ficam presos à tela do celular */ }
+.mp-screen { position: relative; height: 100%; border-radius: 44px; overflow: hidden; overflow: clip; background: #fff; transform: translateZ(0); /* elementos fixed ficam presos à tela do celular */ }
 .mp-scroll { height: 100%; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 90px; }
 .mp-scroll::-webkit-scrollbar { display: none; }
 .mp-cover { height: 150px; background: #ddd center/cover; }
@@ -59,7 +59,7 @@
 .mp-screen .sheet { left: 0; right: 0; top: auto; bottom: 0; width: 100%; max-height: 90%; grid-template-columns: 1fr; border-radius: 26px 26px 0 0; transform: translateY(105%); }
 .mp-screen .sheet.on { transform: none; }
 .mp-screen .sheet .ph { min-height: 150px; }
-.mp-screen .sheet .side { max-height: calc(90vh - 150px); }
+.mp-screen .sheet .side { max-height: calc(calc(90vh / var(--z)) - 150px); }
 .mp-screen .sheet h3 { font-size: 22px; }
 .mp-screen .sheet .x { top: 10px; right: 10px; }
 .mp-screen .bag { width: 100%; }
@@ -67,7 +67,7 @@
 .mp-screen .bag-btn .c { background: #fff; color: var(--r); }
 
 @media (min-width: 761px) {
-  .mp-screen .sheet .side { max-height: calc(min(820px, 88vh) * .9 - 174px); }
+  .mp-screen .sheet .side { max-height: calc(min(820px, calc(88vh / var(--z))) * .9 - 174px); }
 }
 @media (max-width: 1000px) and (min-width: 761px) {
   .mp-grid { grid-template-columns: 1fr 360px; gap: 36px; }
@@ -92,7 +92,7 @@
   .mp-scroll { height: auto; overflow: visible; padding-bottom: 20px; }
   .mp-cats { top: 64px; }
   .mp-cat { scroll-margin-top: 130px; }
-  .mp-screen .sheet { position: fixed; max-height: 92vh; }
-  .mp-screen .sheet .side { max-height: calc(92vh - 150px); }
+  .mp-screen .sheet { position: fixed; max-height: calc(92vh / var(--z)); }
+  .mp-screen .sheet .side { max-height: calc(calc(92vh / var(--z)) - 150px); }
   .mp-screen .bag-btn { position: fixed; left: 12px; right: 84px; bottom: 16px; }
 }
