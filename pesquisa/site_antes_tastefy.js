@@ -350,7 +350,7 @@
     bagBtn.classList.toggle('on', bag.length > 0);
     const hasDrink = bag.some(b => b.extras.some(x => /Coca|Guaran|Fanta/.test(x)) || /coca|guarana|trio|4-em|super|combinho/.test(b.it.id));
     const hasSweet = bag.some(b => b.extras.some(x => /Brigadeiro|Churros/.test(x)) || /brigadeiro|churros|4-em/.test(b.it.id));
-    const doAssistente = bag.some(b => b.extras.includes('Montado pelo Assistente Tastefy'));
+    const doAssistente = bag.some(b => b.extras.includes('Montado pelo Assistente N1'));
     const up = doAssistente ? null : !hasSweet ? byId('brigadeiro') : !hasDrink ? byId('coca') : null;
     const goal = 99, pct = Math.min(100, tot / goal * 100);
     bagEl.innerHTML = `<header><h3>Sacola</h3><button aria-label="Fechar" style="font-size:26px" id="bagX">×</button></header>
@@ -367,59 +367,37 @@
   function closeBag() { bagEl.classList.remove('on'); lenis && lenis.start(); }
   bagBtn.onclick = openBag;
 
-  /* ---------------- ASSISTENTE TASTEFY (IA) ---------------- */
+  /* ---------------- ASSISTENTE N1 (IA) ---------------- */
   const AS = window.N1Assist;
-  // a boca do Tastefy: o lábio de baixo mexe quando ela "fala"
-  const MOUTH = '<svg class="mouth" viewBox="8 28 84 62" aria-hidden="true"><path d="M20 50C30 46 70 46 80 50C80 70 66 82 50 82C34 82 20 70 20 50Z" fill="#2B0A12"/><path d="M26 50C38 47 62 47 74 50L72 57C62 54 38 54 28 57Z" fill="#fff"/><ellipse class="tongue" cx="50" cy="72" rx="15" ry="8.5" fill="#FF6F86"/><path d="M16 50C22 38 38 36 50 43C62 36 78 38 84 50C70 53 30 53 16 50Z" fill="#E5213A" stroke="#111" stroke-width="2.6" stroke-linejoin="round"/><g class="jaw"><path d="M16 50C32 54 68 54 84 50C82 70 66 84 50 84C34 84 18 70 16 50Z" fill="#E5213A" stroke="#111" stroke-width="2.6" stroke-linejoin="round"/><path d="M32 69C40 77 60 77 68 69" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2.4" stroke-linecap="round"/></g><path d="M30 44C36 41 43 41 47 43" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.4" stroke-linecap="round"/></svg>';
-  document.querySelectorAll('[data-mouth]').forEach(el => { el.innerHTML = MOUTH; });
   function makeChat(body, opts = {}) {
+    const auto = !!opts.auto;
     const wait = ms => new Promise(r => setTimeout(r, ms));
     const scroll = () => body.scrollTop = body.scrollHeight;
-    const falar = on => document.querySelectorAll('#aiFab .mouth, #aiPanel .mouth').forEach(m => m.classList.toggle('talk', on));
-    let pending = null, S = {};
     async function bot(html, d = 650) {
-      const t = document.createElement('div'); t.className = 'msg bot typing'; t.innerHTML = '<i></i><i></i><i></i>'; body.appendChild(t); scroll(); falar(true);
-      await wait(d * 0.8); t.className = 'msg bot'; t.innerHTML = html; scroll(); falar(false);
+      const t = document.createElement('div'); t.className = 'msg bot typing'; t.innerHTML = '<i></i><i></i><i></i>'; body.appendChild(t); scroll();
+      await wait(auto ? d : d * 0.8); t.className = 'msg bot'; t.innerHTML = html; scroll();
     }
     const me = txt => { const m = document.createElement('div'); m.className = 'msg me'; m.textContent = txt; body.appendChild(m); scroll(); };
-    function ask(labels) {
+    function ask(options, autoPick) {
       return new Promise(res => {
         const w = document.createElement('div'); w.className = 'qr';
-        labels.forEach((o, i) => { const b = document.createElement('button'); b.textContent = o; b.onclick = () => { w.remove(); pending = null; me(o); res({ i }); }; w.appendChild(b); });
-        pending = { w, res }; body.appendChild(w); scroll();
+        options.forEach((o, i) => { const b = document.createElement('button'); b.textContent = o; b.onclick = () => { w.remove(); me(o); res(i); }; w.appendChild(b); });
+        body.appendChild(w); scroll();
+        if (auto) setTimeout(() => { const b = w.children[autoPick]; if (b) { b.style.background = 'var(--y)'; setTimeout(() => b.click(), 380); } }, 1100);
       });
     }
-    // pergunta um campo (se ainda não foi respondido, nem por botão nem por texto livre)
-    async function q(campo, texto, labels, off = 0) {
-      if (S[campo] != null) return;
-      await bot(texto);
-      while (S[campo] == null) { const r = await ask(labels); if (r.i != null) S[campo] = r.i + off; }
-    }
-    // texto livre: entende frases como "frango pra ver o jogo com 4 amigos" e preenche o que dá
-    function texto(txt) {
-      txt = (txt || '').trim(); if (!txt) return;
-      me(txt);
-      const p = AS.interpretar(txt), fora = p.fora; delete p.fora;
-      if (fora) bot('Ainda não tenho <b>' + fora + '</b> por aqui \u{1f605} Hoje eu estou no cardápio da <b>N1 Chicken</b>: posso te indicar frango crocante, burger, petisco, prato feito ou um docinho.', 600);
-      if (!Object.keys(p).length) { if (!fora) bot('Hmm, essa eu não peguei \u{1f605} Toca numa opção ou me conta assim: <i>"frango pra ver o jogo com 4 amigos"</i>.', 500); return; }
-      Object.assign(S, p);
-      if (pending) { const { w, res } = pending; pending = null; w.remove(); res({ texto: true }); }
-    }
-    async function run() {
-      body.innerHTML = ''; S = {}; pending = null;
-      await bot('Oi! Eu sou a <b>boca do Tastefy</b> \u{1f444} Te ajudo a escolher o que pedir, sozinho ou acompanhado.', 500);
-      await bot('Toca numa opção ou escreve do seu jeito, tipo <i>"frango pra ver o jogo com 4 amigos"</i>. Hoje estou no cardápio da <b>N1 Chicken</b>.', 600);
-      await q('desejo', 'O que tá afim de comer hoje?', AS.DESEJO.map(d => d.label));
-      if (S.pessoas == null) {
-        await q('quem', 'Com quem você vai comer?', AS.QUEM.map(x => x.label));
-        const Q = AS.QUEM[S.quem];
-        if (S.pessoas == null && Q && Q.n != null) S.pessoas = Q.n;
-        if (S.pessoas == null) await q('pessoas', 'Quantos vão, contando você?', ['3', '4', '5 ou mais'], 2);
-      }
-      if (S.pessoas === 4 && S.grande == null) await q('grande', 'Opa, galera! Quantas pessoas?', AS.GRANDE.map(g => g.label));
-      await q('fome', 'E o tamanho da fome? \u{1f605}', AS.FOME.map(f => f.label));
-      if (S.desejo === 3) S.ocasiao = 2; else await q('ocasiao', 'É pra quê?', AS.OCASIAO.map(o => o.label));
-      const pl = AS.plano({ pessoas: S.pessoas, grande: S.grande, fome: S.fome, ocasiao: S.ocasiao, desejo: S.desejo, quem: S.quem, hora: new Date().getHours() }, allItems);
+    async function run(pick = [2, 2, 0]) {
+      body.innerHTML = '';
+      await bot('E aí! Sou o <b>N1</b> \u{1f357} Me fala três coisinhas que eu monto o pedido perfeito em 10 segundos.', 500);
+      await bot('Quantas pessoas vão comer?', 500);
+      const pessoas = await ask(AS.GRUPO.map(g => g.label), pick[0]);
+      let grande = null;
+      if (AS.GRUPO[pessoas].grande) { await bot('Opa, galera! Quantas pessoas?', 450); grande = await ask(AS.GRANDE.map(g => g.label), pick[3] || 0); }
+      await bot('E o tamanho da fome? \u{1f605}');
+      const fome = await ask(AS.FOME.map(f => f.label), pick[1]);
+      await bot('É pra quê?');
+      const ocasiao = await ask(AS.OCASIAO.map(o => o.label), pick[2]);
+      const pl = AS.plano({ pessoas, grande, fome, ocasiao, hora: new Date().getHours() }, allItems);
       await bot(pl.intro, 700);
       const rec = document.createElement('div'); rec.className = 'rec msg';
       rec.innerHTML = pl.opcoes.map(x => '<div class="o ' + (x.o === pl.rec ? 'best' : '') + '"><div class="ph" style="background-image:url(\'' + x.o.img + '\')"></div><div><b>' + x.o.nome + '</b><small>' + x.papel + ' · ' + 'alimenta ~' + pl.alimenta(x.o) + (pl.justo(x.o) ? ' (fica justo)' : '') + ' - ' + brl(pl.porPessoa(x.o)) + '/pessoa</small></div><span class="pz">' + brl(x.o.price) + '</span></div>').join('');
@@ -427,43 +405,43 @@
       // um botão para cada opção (recomendado primeiro)
       const escolhas = [pl.rec, pl.top, pl.econ].filter(Boolean);
       const rotulo = o => o === pl.rec ? (escolhas.length > 1 ? 'Quero o recomendado' : 'Quero esse') : o === pl.top ? 'Quero o completão' : 'Quero o mais em conta';
-      const chosen = escolhas[(await ask(escolhas.map(rotulo))).i];
+      const chosen = escolhas[await ask(escolhas.map(rotulo), pick[4] || 0)];
       const ex = pl.extra(chosen);
       await bot(ex.texto);
-      const b = ex.botoes[(await ask(ex.botoes.map(x => x.label))).i];
+      const b = ex.botoes[await ask(ex.botoes.map(x => x.label), 0)];
       const aceitou = b.qtd > 0;
       const final = aceitou && ex.tipo === 'troca' ? ex.troca : chosen;
       const somaExtra = aceitou && ex.tipo !== 'troca' ? b.total : 0;
       const nomeExtra = somaExtra ? b.nome : '';
       const total = Math.round((final.price + somaExtra) * 100) / 100;
-      if (opts.onAdd) { // agrupa itens iguais numa linha só (ex.: "4× Prato feito N1")
+      if (!auto && opts.onAdd) { // agrupa itens iguais numa linha só (ex.: "4× Prato feito N1")
         const cont = {}; final.ids.forEach(id => cont[id] = (cont[id] || 0) + 1);
         Object.keys(cont).forEach((id, k) => {
           const it = byId(id), q = cont[id], prato = final.prato && id === 'tradicional';
           const nome = (q > 1 ? q + '× ' : '') + (prato ? 'Prato feito N1' : it.name);
-          const notas = ['Montado pelo Assistente Tastefy'].concat(prato ? ['Cada um escolhe: Tradicional, Parmegiana ou Frito com Salada (esses dois saem R$ 1,00 a menos)'] : [], k === 0 && nomeExtra ? [nomeExtra] : []);
+          const notas = ['Montado pelo Assistente N1'].concat(prato ? ['Cada um escolhe: Tradicional, Parmegiana ou Frito com Salada (esses dois saem R$ 1,00 a menos)'] : [], k === 0 && nomeExtra ? [nomeExtra] : []);
           opts.onAdd(Object.assign({}, it, { name: nome }), Math.round((it.price * q + (k === 0 ? somaExtra : 0)) * 100) / 100, notas);
         });
       }
-      await bot('Fechado! <b>' + final.nome + '</b>' + (nomeExtra ? ' + ' + nomeExtra : '') + ' = <b>' + brl(total) + '</b>. Já coloquei na sua sacola \u{1f609}', 800);
+      await bot('Fechado! <b>' + final.nome + '</b>' + (nomeExtra ? ' + ' + nomeExtra : '') + ' = <b>' + brl(total) + '</b>. ' + (auto ? 'Chega em 35–45 min. Te aviso: empanando → fritando → saiu \u{1f6f5}' : 'Já coloquei na sua sacola \u{1f609}'), 800);
+      if (auto) { await wait(3200); return run([[3, 2, 0], [0, 1, 1], [1, 0, 1], [4, 1, 0, 3]][Math.floor(Math.random() * 4)]); }
       const again = document.createElement('div'); again.className = 'qr';
       again.innerHTML = '<button>Montar outro</button><button>Ver sacola</button>';
       again.children[0].onclick = () => run();
       again.children[1].onclick = () => { closeAI(); const t = $('#cardapio'); if (inPhone()) { lenis ? lenis.scrollTo(t, { duration: 1 }) : t.scrollIntoView(); setTimeout(openBag, 700); } else openBag(); };
       body.appendChild(again); scroll();
     }
-    return { run, texto };
+    return { run };
   }
-  const aiFab = $('#aiFab'), aiPanel = $('#aiPanel'), aiInput = $('#aiInput');
+  const aiFab = $('#aiFab'), aiPanel = $('#aiPanel');
   const chat = makeChat($('#aiBody'), { onAdd: (it, price, extras) => addToBag(it, price, extras) });
   let aiStarted = false;
   aiFab.onclick = () => { aiPanel.classList.toggle('on'); aiFab.classList.remove('hint'); if (!aiStarted) { aiStarted = true; chat.run(); } };
   function closeAI() { aiPanel.classList.remove('on'); }
   $('#aiClose').onclick = closeAI;
-  $('#aiForm').onsubmit = e => { e.preventDefault(); const v = aiInput.value; aiInput.value = ''; chat.texto(v); };
   setTimeout(() => aiFab.classList.remove('hint'), 9000);
 
-  // (a seção App + IA saiu do site; o Assistente Tastefy continua na bolinha do canto)
+  // (a seção App + IA saiu do site; o Assistente N1 continua na bolinha do canto)
 
   /* ---------------- CMV 28%: dumbbell + tabela ---------------- */
   (() => {
